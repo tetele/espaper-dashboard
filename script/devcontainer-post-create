@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -e
+# set -x
+
+mkdir -p .temp
+
+cp /esphome/pyproject.toml .

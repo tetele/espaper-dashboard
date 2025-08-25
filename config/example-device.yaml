@@ -1,0 +1,16 @@
+esphome:
+  name: example-device
+  friendly_name: Example Device
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+external_components:
+  - source:
+      type: local
+      path: ../components
+
+example_component:
+  foo: true
