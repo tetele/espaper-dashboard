@@ -1,6 +1,7 @@
 #pragma once
 
 #include "esphome/core/component.h"
+#include "esphome/components/display/display.h"
 
 namespace esphome {
 namespace espaper_dashboard {
@@ -12,14 +13,14 @@ public:
     void loop() override;
     void dump_config() override;
 
-    void set_foo(bool foo) { this->foo_ = foo; }
-    void set_bar(std::string bar) { this->bar_ = bar; }
-    void set_baz(int baz) { this->baz_ = baz; }
+    void set_display(display::Display *display) { this->display_ = display; };
+    void set_background_color(Color color) { this->bg_color_ = color; };
+    void set_foreground_color(Color color) { this->fg_color_ = color; };
 
 protected:
-    bool foo_{false};
-    std::string bar_{};
-    int baz_{0};
+    display::Display *display_{nullptr};
+    Color bg_color_{display::COLOR_ON};
+    Color fg_color_{display::COLOR_OFF};
 };
 
 } // namespace espaper_dashboard

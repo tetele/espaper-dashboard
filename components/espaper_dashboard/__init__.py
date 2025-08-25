@@ -1,20 +1,24 @@
 import esphome.codegen as cg
+from esphome.components import display
 import esphome.config_validation as cv
-from esphome.const import CONF_ID
-
-CONF_FOO = "foo"
-CONF_BAR = "bar"
-CONF_BAZ = "baz"
+from esphome.const import (
+    CONF_BACKGROUND_COLOR,
+    CONF_DISPLAY_ID,
+    CONF_FOREGROUND_COLOR,
+    CONF_ID,
+)
 
 espaper_dashboard_ns = cg.esphome_ns.namespace("espaper_dashboard")
 ESPaperDashboard = espaper_dashboard_ns.class_("ESPaperDashboard", cg.Component)
 
+Color = cg.esphome_ns.class_("Color")
+
 CONFIG_SCHEMA = cv.Schema(
     {
         cv.GenerateID(): cv.declare_id(ESPaperDashboard),
-        cv.Required(CONF_FOO): cv.boolean,
-        cv.Optional(CONF_BAR): cv.string,
-        cv.Optional(CONF_BAZ): cv.int_range(0, 255),
+        cv.GenerateID(CONF_DISPLAY_ID): cv.use_id(display.Display),
+        cv.Optional(CONF_BACKGROUND_COLOR): cv.use_id(Color),
+        cv.Optional(CONF_FOREGROUND_COLOR): cv.use_id(Color),
     }
 )
 
@@ -24,8 +28,10 @@ async def to_code(config):
 
     await cg.register_component(var, config)
 
-    cg.add(var.set_foo(config[CONF_FOO]))
-    if bar := config.get(CONF_BAR):
-        cg.add(var.set_bar(bar))
-    if baz := config.get(CONF_BAZ):
-        cg.add(var.set_baz(baz))
+    target_display = await cg.get_variable(config[CONF_DISPLAY_ID])
+    cg.add(var.set_display(target_display))
+
+    bg_color = await cg.get_variable(config[CONF_BACKGROUND_COLOR])
+    cg.add(var.set_background_color(bg_color))
+    fg_color = await cg.get_variable(config[CONF_FOREGROUND_COLOR])
+    cg.add(var.set_foreground_color(fg_color))

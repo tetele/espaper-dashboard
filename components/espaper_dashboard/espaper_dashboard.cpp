@@ -21,9 +21,6 @@ void ESPaperDashboard::loop()
 void ESPaperDashboard::dump_config()
 {
     ESP_LOGCONFIG(TAG, "ESPaper Dashboard");
-    ESP_LOGCONFIG(TAG, "  foo = %s", TRUEFALSE(this->foo_));
-    ESP_LOGCONFIG(TAG, "  bar = %s", this->bar_.c_str());
-    ESP_LOGCONFIG(TAG, "  baz = %i", this->baz_);
 }
 
 } // namespace espaper_dashboard
