@@ -3,9 +3,9 @@
 #include "esphome/core/component.h"
 
 namespace esphome {
-namespace example_component {
+namespace espaper_dashboard {
 
-class ExampleComponent : public Component
+class ESPaperDashboard : public Component
 {
 public:
     void setup() override;
@@ -22,5 +22,5 @@ protected:
     int baz_{0};
 };
 
-} // namespace example_component
+} // namespace espaper_dashboard
 } // namespace esphome

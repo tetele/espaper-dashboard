@@ -1,0 +1,20 @@
+esphome:
+  name: espaper-dashboard
+  friendly_name: ESPaper Dashboard
+
+host:
+
+external_components:
+  - source:
+      type: local
+      path: ../components
+
+display:
+  - platform: sdl
+    show_test_card: true
+    dimensions:
+      width: 480
+      height: 800
+
+espaper_dashboard:
+  foo: true

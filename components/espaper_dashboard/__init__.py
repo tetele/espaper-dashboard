@@ -6,12 +6,12 @@ CONF_FOO = "foo"
 CONF_BAR = "bar"
 CONF_BAZ = "baz"
 
-example_component_ns = cg.esphome_ns.namespace("example_component")
-ExampleComponent = example_component_ns.class_("ExampleComponent", cg.Component)
+espaper_dashboard_ns = cg.esphome_ns.namespace("espaper_dashboard")
+ESPaperDashboard = espaper_dashboard_ns.class_("ESPaperDashboard", cg.Component)
 
 CONFIG_SCHEMA = cv.Schema(
     {
-        cv.GenerateID(): cv.declare_id(ExampleComponent),
+        cv.GenerateID(): cv.declare_id(ESPaperDashboard),
         cv.Required(CONF_FOO): cv.boolean,
         cv.Optional(CONF_BAR): cv.string,
         cv.Optional(CONF_BAZ): cv.int_range(0, 255),
