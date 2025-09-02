@@ -15,9 +15,13 @@ CONF_DARK_COLOR = "dark_color"
 CONF_SHOULD_DRAW = "should_draw"
 CONF_WIDGETS = "widgets"
 
+CONF_FORECAST = "forecast"
+
 espaper_dashboard_ns = cg.esphome_ns.namespace("espaper_dashboard")
 ESPaperDashboard = espaper_dashboard_ns.class_("ESPaperDashboard", cg.Component)
 ESPaperDashboardWidget = espaper_dashboard_ns.class_("ESPaperDashboardWidget")
+
+WeatherWidget = espaper_dashboard_ns.class_("WeatherWidget", ESPaperDashboardWidget)
 
 Color = cg.esphome_ns.class_("Color")
 
@@ -28,7 +32,25 @@ WIDGET_SCHEMA_BASE = cv.Schema(
     },
 )
 
+WeatherForecastType = espaper_dashboard_ns.enum("WeatherForecastType_t")
+FORECAST_HOURLY = "hourly"
+FORECAST_TWICE_DAILY = "twice_daily"
+FORECAST_DAILY = "daily"
+WEATHER_WIDGET_SCHEMA = WIDGET_SCHEMA_BASE.extend(
+    {
+        cv.Optional(CONF_FORECAST, default=FORECAST_HOURLY): cv.enum(
+            {
+                FORECAST_HOURLY: WeatherForecastType.FORECAST_HOURLY,
+                FORECAST_TWICE_DAILY: WeatherForecastType.FORECAST_TWICE_DAILY,
+                FORECAST_DAILY: WeatherForecastType.FORECAST_DAILY,
+            },
+            lower=True,
+        )
+    }
+)
+
 WIDGET_TYPES = {
+    "weather": (WeatherWidget, WEATHER_WIDGET_SCHEMA),
 }
 
 WIDGET_SCHEMA = cv.typed_schema(

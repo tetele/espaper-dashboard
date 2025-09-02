@@ -26,5 +26,22 @@ protected:
     display::Display *get_display_() { return this->target_->get_display(); };
 };
 
+typedef enum {
+    FORECAST_DAILY,
+    FORECAST_TWICE_DAILY,
+    FORECAST_HOURLY,
+} WeatherForecastType;
+
+class WeatherWidget : public ESPaperDashboardWidget {
+public:
+    void draw(int start_x, int start_y) override;
+    void init_size() override;
+
+    void set_forecast(WeatherForecastType forecast) { this->forecast_ = forecast; };
+
+protected:
+    WeatherForecastType forecast_{FORECAST_HOURLY};
+};
+
 } // namespace espaper_dashboard
 } // namespace esphome

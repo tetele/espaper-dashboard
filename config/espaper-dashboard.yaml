@@ -44,6 +44,13 @@ espaper_dashboard:
   foreground_color: color_black
   light_color: color_light_gray
   dark_color: color_dark_gray
+  widgets:
+    - id: weather_today
+      type: weather
+      forecast: hourly
+    - id: weather_tomorrow
+      type: weather
+      forecast: twice_daily
 
 binary_sensor:
   - id: space_key
