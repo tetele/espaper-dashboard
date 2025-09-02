@@ -1,5 +1,6 @@
 #include "esphome/core/log.h"
 #include "espaper_dashboard.h"
+#include "espaper_dashboard_widget.h"
 
 namespace esphome {
 namespace espaper_dashboard {
@@ -10,6 +11,10 @@ void ESPaperDashboard::setup()
 {
     // Code here should perform all component initialization,
     //  whether hardware, memory, or otherwise
+
+    for(auto widget : this->widgets_) {
+        widget->init_size();
+    }
 }
 
 void ESPaperDashboard::loop()
@@ -21,6 +26,10 @@ void ESPaperDashboard::loop()
 void ESPaperDashboard::dump_config()
 {
     ESP_LOGCONFIG(TAG, "ESPaper Dashboard");
+}
+
+void ESPaperDashboard::add_widget(ESPaperDashboardWidget *widget) {
+    this->widgets_.push_back(widget);
 }
 
 } // namespace espaper_dashboard

@@ -11,11 +11,27 @@ from esphome.const import (
 CONF_LABEL_COLOR = "label_color"
 CONF_LIGHT_COLOR = "light_color"
 CONF_DARK_COLOR = "dark_color"
+CONF_WIDGETS = "widgets"
 
 espaper_dashboard_ns = cg.esphome_ns.namespace("espaper_dashboard")
 ESPaperDashboard = espaper_dashboard_ns.class_("ESPaperDashboard", cg.Component)
+ESPaperDashboardWidget = espaper_dashboard_ns.class_("ESPaperDashboardWidget")
 
 Color = cg.esphome_ns.class_("Color")
+
+WIDGET_SCHEMA_BASE = cv.Schema(
+    {
+        cv.GenerateID(CONF_ID): cv.declare_id(ESPaperDashboardWidget),
+    },
+)
+
+WIDGET_TYPES = {
+}
+
+WIDGET_SCHEMA = cv.typed_schema(
+    ({type: data[1] for (type, data) in WIDGET_TYPES.items()}),
+    lower=True,
+)
 
 CONFIG_SCHEMA = cv.Schema(
     {
@@ -26,6 +42,7 @@ CONFIG_SCHEMA = cv.Schema(
         cv.Optional(CONF_LABEL_COLOR): cv.use_id(Color),
         cv.Optional(CONF_LIGHT_COLOR): cv.use_id(Color),
         cv.Optional(CONF_DARK_COLOR): cv.use_id(Color),
+        cv.Required(CONF_WIDGETS): cv.ensure_list(WIDGET_SCHEMA),
     }
 )
 
@@ -53,3 +70,12 @@ async def to_code(config):
     if CONF_DARK_COLOR in config:
         dark_color = await cg.get_variable(config[CONF_DARK_COLOR])
         cg.add(var.set_dark_color(dark_color))
+
+    for widget_conf in config[CONF_WIDGETS]:
+        widget_type = WIDGET_TYPES[widget_conf[CONF_TYPE]]
+        widget = cg.Pvariable(
+            widget_conf[CONF_ID], widget_type[0].new(), widget_type[0]
+        )
+
+        cg.add(var.add_widget(widget))
+        cg.add(widget.set_target(var))

@@ -6,6 +6,8 @@
 namespace esphome {
 namespace espaper_dashboard {
 
+class ESPaperDashboardWidget;
+
 class ESPaperDashboard : public Component
 {
 public:
@@ -26,6 +28,8 @@ public:
     void set_dark_color(Color color) { this->dark_color_ = color; };
     Color get_dark_color() { return this->dark_color_; };
 
+    void add_widget(ESPaperDashboardWidget *widget);
+
 protected:
     display::Display *display_{nullptr};
     Color bg_color_{display::COLOR_ON};
@@ -33,6 +37,8 @@ protected:
     Color label_color_{display::COLOR_OFF};
     Color light_color_{display::COLOR_OFF};
     Color dark_color_{display::COLOR_OFF};
+
+    std::vector<ESPaperDashboardWidget *> widgets_;
 };
 
 } // namespace espaper_dashboard
