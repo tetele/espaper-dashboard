@@ -5,4 +5,6 @@ FROM ghcr.io/esphome/esphome:${BUILD_BASE_VERSION} AS base
 
 RUN git config --system --add safe.directory "*"
 
+RUN apt-get update && apt-get install libsdl2-dev libsodium-dev build-essential git
+
 WORKDIR /workspaces
