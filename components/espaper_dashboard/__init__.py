@@ -89,3 +89,8 @@ async def to_code(config):
             )
 
             cg.add(widget.set_should_draw(lambda_))
+
+        for k, v in widget_conf.items():
+            if k not in (CONF_ID, CONF_SHOULD_DRAW, CONF_TYPE):
+                method = getattr(widget, "set_" + k)
+                cg.add(method(v))
