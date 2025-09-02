@@ -21,12 +21,18 @@ public:
     Color get_foreground_color() { return this->fg_color_; };
     void set_label_color(Color color) { this->label_color_ = color; };
     Color get_label_color() { return this->label_color_; };
+    void set_light_color(Color color) { this->light_color_ = color; };
+    Color get_light_color() { return this->light_color_; };
+    void set_dark_color(Color color) { this->dark_color_ = color; };
+    Color get_dark_color() { return this->dark_color_; };
 
 protected:
     display::Display *display_{nullptr};
     Color bg_color_{display::COLOR_ON};
     Color fg_color_{display::COLOR_OFF};
     Color label_color_{display::COLOR_OFF};
+    Color light_color_{display::COLOR_OFF};
+    Color dark_color_{display::COLOR_OFF};
 };
 
 } // namespace espaper_dashboard

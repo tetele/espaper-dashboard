@@ -9,6 +9,8 @@ from esphome.const import (
 )
 
 CONF_LABEL_COLOR = "label_color"
+CONF_LIGHT_COLOR = "light_color"
+CONF_DARK_COLOR = "dark_color"
 
 espaper_dashboard_ns = cg.esphome_ns.namespace("espaper_dashboard")
 ESPaperDashboard = espaper_dashboard_ns.class_("ESPaperDashboard", cg.Component)
@@ -22,6 +24,8 @@ CONFIG_SCHEMA = cv.Schema(
         cv.Optional(CONF_BACKGROUND_COLOR): cv.use_id(Color),
         cv.Optional(CONF_FOREGROUND_COLOR): cv.use_id(Color),
         cv.Optional(CONF_LABEL_COLOR): cv.use_id(Color),
+        cv.Optional(CONF_LIGHT_COLOR): cv.use_id(Color),
+        cv.Optional(CONF_DARK_COLOR): cv.use_id(Color),
     }
 )
 
@@ -43,3 +47,9 @@ async def to_code(config):
     if CONF_LABEL_COLOR in config:
         label_color = await cg.get_variable(config[CONF_LABEL_COLOR])
         cg.add(var.set_label_color(label_color))
+    if CONF_LIGHT_COLOR in config:
+        light_color = await cg.get_variable(config[CONF_LIGHT_COLOR])
+        cg.add(var.set_light_color(light_color))
+    if CONF_DARK_COLOR in config:
+        dark_color = await cg.get_variable(config[CONF_DARK_COLOR])
+        cg.add(var.set_dark_color(dark_color))
