@@ -11,6 +11,9 @@ void ESPaperDashboard::setup()
 {
     // Code here should perform all component initialization,
     //  whether hardware, memory, or otherwise
+    this->display_->set_writer([this](display::Display &it) -> void {
+        this->draw();
+    });
 
     for(auto widget : this->widgets_) {
         widget->init_size();
@@ -26,6 +29,20 @@ void ESPaperDashboard::loop()
 void ESPaperDashboard::dump_config()
 {
     ESP_LOGCONFIG(TAG, "ESPaper Dashboard");
+}
+
+void ESPaperDashboard::draw() {
+    this->display_->fill(this->get_background_color());
+
+    int total_height = 0;
+    for(auto widget : this->widgets_) {
+        if(total_height + widget->get_height() > this->display_->get_height()) break;
+
+        this->display_->start_clipping(0, total_height, widget->get_width(), total_height+widget->get_height());
+        widget->draw(0, total_height);
+        this->display_->end_clipping();
+        total_height += widget->get_height();
+    }
 }
 
 void ESPaperDashboard::add_widget(ESPaperDashboardWidget *widget) {

@@ -15,6 +15,8 @@ public:
     void loop() override;
     void dump_config() override;
 
+    void draw();
+
     void set_display(display::Display *display) { this->display_ = display; };
     display::Display *get_display() { return this->display_; };
     void set_background_color(Color color) { this->bg_color_ = color; };
