@@ -11,6 +11,7 @@ external_components:
 
 display:
   - platform: sdl
+    id: the_display
     show_test_card: true
     dimensions:
       width: 480
@@ -43,3 +44,10 @@ espaper_dashboard:
   foreground_color: color_black
   light_color: color_light_gray
   dark_color: color_dark_gray
+
+binary_sensor:
+  - id: space_key
+    platform: sdl
+    key: SDLK_SPACE
+    on_release:
+      - component.update: the_display
