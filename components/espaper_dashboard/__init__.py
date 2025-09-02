@@ -12,6 +12,7 @@ from esphome.const import (
 CONF_LABEL_COLOR = "label_color"
 CONF_LIGHT_COLOR = "light_color"
 CONF_DARK_COLOR = "dark_color"
+CONF_SHOULD_DRAW = "should_draw"
 CONF_WIDGETS = "widgets"
 
 espaper_dashboard_ns = cg.esphome_ns.namespace("espaper_dashboard")
@@ -23,6 +24,7 @@ Color = cg.esphome_ns.class_("Color")
 WIDGET_SCHEMA_BASE = cv.Schema(
     {
         cv.GenerateID(CONF_ID): cv.declare_id(ESPaperDashboardWidget),
+        cv.Optional(CONF_SHOULD_DRAW): cv.lambda_,
     },
 )
 
@@ -80,3 +82,10 @@ async def to_code(config):
 
         cg.add(var.add_widget(widget))
         cg.add(widget.set_target(var))
+
+        if CONF_SHOULD_DRAW in widget_conf:
+            lambda_ = await cg.process_lambda(
+                widget_conf[CONF_SHOULD_DRAW], [], return_type=cg.bool_
+            )
+
+            cg.add(widget.set_should_draw(lambda_))

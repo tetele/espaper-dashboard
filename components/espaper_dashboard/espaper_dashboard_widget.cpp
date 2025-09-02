@@ -18,5 +18,11 @@ void ESPaperDashboardWidget::set_size(int width, int height) {
     this->height_ = height;
 }
 
+bool ESPaperDashboardWidget::should_draw() {
+    if (this->should_draw_.has_value())
+        return (*this->should_draw_)();
+    return true;
+}
+
 }
 }

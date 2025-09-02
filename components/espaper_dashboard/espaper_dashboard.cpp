@@ -37,6 +37,7 @@ void ESPaperDashboard::draw() {
     int total_height = 0;
     for(auto widget : this->widgets_) {
         if(total_height + widget->get_height() > this->display_->get_height()) break;
+        if(!widget->should_draw()) continue;
 
         this->display_->start_clipping(0, total_height, widget->get_width(), total_height+widget->get_height());
         widget->draw(0, total_height);
