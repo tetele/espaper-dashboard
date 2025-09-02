@@ -6,6 +6,7 @@ from esphome.const import (
     CONF_DISPLAY_ID,
     CONF_FOREGROUND_COLOR,
     CONF_ID,
+    CONF_TYPE,
 )
 
 CONF_LABEL_COLOR = "label_color"
