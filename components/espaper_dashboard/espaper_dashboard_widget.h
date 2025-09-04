@@ -37,10 +37,10 @@ public:
     void draw(int start_x, int start_y) override;
     void init_size() override;
 
-    void set_forecast(WeatherForecastType forecast) { this->forecast_ = forecast; };
+    void set_forecast_type(WeatherForecastType forecast_type) { this->forecast_type_ = forecast_type; };
 
 protected:
-    WeatherForecastType forecast_{FORECAST_HOURLY};
+    WeatherForecastType forecast_type_{FORECAST_HOURLY};
 };
 
 } // namespace espaper_dashboard

@@ -47,10 +47,10 @@ espaper_dashboard:
   widgets:
     - id: weather_today
       type: weather
-      forecast: hourly
+      forecast_type: hourly
     - id: weather_tomorrow
       type: weather
-      forecast: twice_daily
+      forecast_type: twice_daily
 
 binary_sensor:
   - id: space_key

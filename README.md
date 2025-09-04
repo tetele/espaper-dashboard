@@ -30,7 +30,7 @@ espaper_dashboard: # component name
     - id: weather_today
       should_draw: !lambda 'return true;' # common to all widgets, optional, defaults to true
       type: weather # required
-      forecast: hourly # weather-specific field
+      forecast_type: hourly # weather-specific field
 ```
 
 ### Widget configuration variables
@@ -45,7 +45,7 @@ espaper_dashboard: # component name
 
 Specific configuration:
 
-- **forecast** (*Optional*): The type of forecast to display. Default is `hourly`.
+- **forecast_type** (*Optional*): The type of forecast to display. Default is `hourly`.
   - **hourly**: Hourly forecast
   - **twice_daily**: Twice daily forecast
   - **daily**: Daily forecast

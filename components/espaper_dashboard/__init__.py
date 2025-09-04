@@ -15,7 +15,7 @@ CONF_DARK_COLOR = "dark_color"
 CONF_SHOULD_DRAW = "should_draw"
 CONF_WIDGETS = "widgets"
 
-CONF_FORECAST = "forecast"
+CONF_FORECAST = "forecast_type"
 
 espaper_dashboard_ns = cg.esphome_ns.namespace("espaper_dashboard")
 ESPaperDashboard = espaper_dashboard_ns.class_("ESPaperDashboard", cg.Component)
