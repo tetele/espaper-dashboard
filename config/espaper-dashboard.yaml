@@ -39,11 +39,36 @@ color:
     blue: 0%
     white: 0%
 
+font:
+  - id: default_font
+    file: gfonts://Roboto
+    size: 20
+    bpp: 2
+    glyphsets:
+      - GF_Latin_Kernel
+  - id: large_font
+    file: gfonts://Roboto@900
+    size: 42
+    bpp: 2
+    glyphsets:
+      - GF_Latin_Kernel
+  - id: glyph_font
+    file: gfonts://Material+Symbols
+    size: 20
+  - id: glyph_font_large
+    file: gfonts://Material+Symbols+Outlined
+    size: 42
+    glyphs: *mdi-weather-glyphs
+
 espaper_dashboard:
   background_color: color_white
   foreground_color: color_black
   light_color: color_light_gray
   dark_color: color_dark_gray
+  default_font: default_font
+  large_font: large_font
+  glyph_font: glyph_font
+  large_glyph_font: glyph_font_large
   widgets:
     - id: weather_today
       type: weather

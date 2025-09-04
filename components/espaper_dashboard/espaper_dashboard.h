@@ -2,6 +2,7 @@
 
 #include "esphome/core/component.h"
 #include "esphome/components/display/display.h"
+#include "esphome/components/font/font.h"
 
 namespace esphome {
 namespace espaper_dashboard {
@@ -29,6 +30,14 @@ public:
     Color get_light_color() { return this->light_color_; };
     void set_dark_color(Color color) { this->dark_color_ = color; };
     Color get_dark_color() { return this->dark_color_; };
+    void set_default_font(font::Font *font) { this->default_font_ = font; };
+    font::Font *get_default_font() { return this->default_font_; };
+    void set_large_font(font::Font *font) { this->large_font_ = font; };
+    font::Font *get_large_font() { return this->large_font_; };
+    void set_glyph_font(font::Font *font) { this->glyph_font_ = font; };
+    font::Font *get_glyph_font() { return this->glyph_font_; };
+    void set_large_glyph_font(font::Font *font) { this->large_glyph_font_ = font; };
+    font::Font *get_large_glyph_font() { return this->large_glyph_font_; };
 
     void add_widget(ESPaperDashboardWidget *widget);
 
@@ -39,6 +48,10 @@ protected:
     Color label_color_{display::COLOR_OFF};
     Color light_color_{display::COLOR_OFF};
     Color dark_color_{display::COLOR_OFF};
+    font::Font *default_font_{nullptr};
+    font::Font *large_font_{nullptr};
+    font::Font *glyph_font_{nullptr};
+    font::Font *large_glyph_font_{nullptr};
 
     std::vector<ESPaperDashboardWidget *> widgets_;
 };

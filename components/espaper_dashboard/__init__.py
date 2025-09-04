@@ -12,6 +12,10 @@ from esphome.const import (
 CONF_LABEL_COLOR = "label_color"
 CONF_LIGHT_COLOR = "light_color"
 CONF_DARK_COLOR = "dark_color"
+CONF_DEFAULT_FONT = "default_font"
+CONF_LARGE_FONT = "large_font"
+CONF_GLYPH_FONT = "glyph_font"
+CONF_LARGE_GLYPH_FONT = "large_glyph_font"
 CONF_SHOULD_DRAW = "should_draw"
 CONF_WIDGETS = "widgets"
 
@@ -24,6 +28,7 @@ ESPaperDashboardWidget = espaper_dashboard_ns.class_("ESPaperDashboardWidget")
 WeatherWidget = espaper_dashboard_ns.class_("WeatherWidget", ESPaperDashboardWidget)
 
 Color = cg.esphome_ns.class_("Color")
+Font = cg.esphome_ns.namespace("font").class_("Font")
 
 WIDGET_SCHEMA_BASE = cv.Schema(
     {
@@ -67,6 +72,10 @@ CONFIG_SCHEMA = cv.Schema(
         cv.Optional(CONF_LABEL_COLOR): cv.use_id(Color),
         cv.Optional(CONF_LIGHT_COLOR): cv.use_id(Color),
         cv.Optional(CONF_DARK_COLOR): cv.use_id(Color),
+        cv.Required(CONF_DEFAULT_FONT): cv.use_id(Font),
+        cv.Optional(CONF_LARGE_FONT): cv.use_id(Font),
+        cv.Required(CONF_GLYPH_FONT): cv.use_id(Font),
+        cv.Optional(CONF_LARGE_GLYPH_FONT): cv.use_id(Font),
         cv.Required(CONF_WIDGETS): cv.ensure_list(WIDGET_SCHEMA),
     }
 )
@@ -95,6 +104,24 @@ async def to_code(config):
     if CONF_DARK_COLOR in config:
         dark_color = await cg.get_variable(config[CONF_DARK_COLOR])
         cg.add(var.set_dark_color(dark_color))
+
+    default_font = await cg.get_variable(config[CONF_DEFAULT_FONT])
+    cg.add(var.set_default_font(default_font))
+
+    if CONF_LARGE_FONT in config:
+        large_font = await cg.get_variable(config[CONF_LARGE_FONT])
+        cg.add(var.set_large_font(large_font))
+    else:
+        cg.add(var.set_large_font(default_font))
+
+    glyph_font = await cg.get_variable(config[CONF_GLYPH_FONT])
+    cg.add(var.set_glyph_font(glyph_font))
+
+    if CONF_LARGE_GLYPH_FONT in config:
+        large_glyph_font = await cg.get_variable(config[CONF_LARGE_GLYPH_FONT])
+        cg.add(var.set_large_glyph_font(large_glyph_font))
+    else:
+        cg.add(var.set_large_glyph_font(glyph_font))
 
     for widget_conf in config[CONF_WIDGETS]:
         widget_type = WIDGET_TYPES[widget_conf[CONF_TYPE]]

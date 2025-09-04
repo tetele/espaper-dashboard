@@ -17,6 +17,10 @@ external_components:
 - **label_color** (*Optional*, [Color](https://www.esphome.io/components/display/#color)): The color used to render text labels. Defaults to `COLOR_OFF`.
 - **light_color** (*Optional*, [Color](https://www.esphome.io/components/display/#color)): The color used to render elements of the least importance. Defaults to `COLOR_OFF`.
 - **dark_color** (*Optional*, [Color](https://www.esphome.io/components/display/#color)): The color used to render elements of the second least importance. Defaults to `COLOR_OFF`.
+- **default_font** (**Required**, [Font](https://www.esphome.io/components/font/)): The default font if no other font is specified.
+- **large_font** (*Optional*, [Font](https://www.esphome.io/components/font/)): The font used for main information.
+- **glyph_font** (**Required**, [Font](https://www.esphome.io/components/font/)): The font containing glyphs, icons and symbols.
+- **large_glyph_font** (*Optional*, [Font](https://www.esphome.io/components/font/)): The glyph font used for main information.
 - **widgets** (**Required**, list): The list of widgets that the dashboard will have to register. Adding a widget here does not guarantee it will be rendered.
 
 ```yaml
