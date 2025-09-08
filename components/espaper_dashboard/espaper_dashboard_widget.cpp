@@ -1,6 +1,8 @@
 #include "espaper_dashboard_widget.h"
 #include "esphome/core/log.h"
 
+#include <map>
+
 
 
 namespace esphome {
