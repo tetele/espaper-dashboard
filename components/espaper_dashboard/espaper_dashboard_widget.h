@@ -29,12 +29,6 @@ protected:
 };
 
 typedef enum {
-    FORECAST_DAILY,
-    FORECAST_TWICE_DAILY,
-    FORECAST_HOURLY,
-} WeatherForecastType;
-
-typedef enum {
     CONDITION_CLEAR_NIGHT,
     CONDITION_CLOUDY,
     CONDITION_EXCEPTIONAL,
@@ -57,14 +51,12 @@ public:
     void draw(int start_x, int start_y) override;
     void init_size() override;
 
-    void set_forecast_type(WeatherForecastType forecast_type) { this->forecast_type_ = forecast_type; };
     void set_current_temperature_sensor(sensor::Sensor *sensor) { this->current_temperature_sensor_ = sensor; };
     void set_current_condition_sensor(text_sensor::TextSensor *sensor) { this->current_condition_sensor_ = sensor; };
     void set_forecast_sensor(text_sensor::TextSensor *sensor) { this->forecast_sensor_ = sensor; };
     void set_temperature_uom(std::string uom) { this->temperature_uom_ = uom; };
 
 protected:
-    WeatherForecastType forecast_type_{FORECAST_HOURLY};
     sensor::Sensor *current_temperature_sensor_{nullptr};
     text_sensor::TextSensor *current_condition_sensor_{nullptr};
     text_sensor::TextSensor *forecast_sensor_{nullptr};

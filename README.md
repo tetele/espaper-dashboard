@@ -36,11 +36,16 @@ espaper_dashboard: # component name
   foreground_color: color_black
   light_color: color_light_gray
   dark_color: color_dark_gray
+  default_font: default_font
+  large_font: large_font
+  glyph_font: glyph_font
   widgets: # list of widgets
     - id: weather_today
       should_draw: !lambda 'return true;' # common to all widgets, optional, defaults to true
       type: weather # required
-      forecast_type: hourly # weather-specific field
+      current_condition_sensor_id: weather_current_condition
+      current_temperature_sensor_id: weather_current_temperature
+      forecast_sensor_id: weather_hourly_forecast
 ```
 
 ### Widget configuration variables
@@ -55,10 +60,6 @@ espaper_dashboard: # component name
 
 Specific configuration:
 
-- **forecast_type** (*Optional*): The type of forecast to display. Default is `hourly`.
-  - **hourly**: Hourly forecast
-  - **twice_daily**: Twice daily forecast
-  - **daily**: Daily forecast
 - **temperature_uom** (*Optional*, `string`): The unit of measurement for the temperature. Defaults to `°C`.
 - **current_temperature_sensor_id** (**Required**, [Sensor](https://esphome.io/components/sensor/)): The ID of a `Sensor` containing the current temperature.
 - **current_condition_sensor_id** (**Required**, [TextSensor](https://esphome.io/components/text_sensor)): The ID of a `TextSensor` containing the current weather condition, which must be one of [these values](https://developers.home-assistant.io/docs/core/entity/weather#recommended-values-for-state-and-condition).

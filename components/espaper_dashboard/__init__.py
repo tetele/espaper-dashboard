@@ -21,8 +21,6 @@ CONF_LARGE_GLYPH_FONT = "large_glyph_font"
 CONF_SHOULD_DRAW = "should_draw"
 CONF_WIDGETS = "widgets"
 
-CONF_FORECAST = "forecast_type"
-
 espaper_dashboard_ns = cg.esphome_ns.namespace("espaper_dashboard")
 ESPaperDashboard = espaper_dashboard_ns.class_("ESPaperDashboard", cg.Component)
 ESPaperDashboardWidget = espaper_dashboard_ns.class_("ESPaperDashboardWidget")
@@ -45,20 +43,8 @@ CONF_CURRENT_TEMPERATURE_SENSOR_ID = "current_temperature_sensor_id"
 CONF_CURRENT_CONDITION_SENSOR_ID = "current_condition_sensor_id"
 CONF_FORECAST_SENSOR_ID = "forecast_sensor_id"
 
-WeatherForecastType = espaper_dashboard_ns.enum("WeatherForecastType_t")
-FORECAST_HOURLY = "hourly"
-FORECAST_TWICE_DAILY = "twice_daily"
-FORECAST_DAILY = "daily"
 WEATHER_WIDGET_SCHEMA = WIDGET_SCHEMA_BASE.extend(
     {
-        cv.Optional(CONF_FORECAST, default=FORECAST_HOURLY): cv.enum(
-            {
-                FORECAST_HOURLY: WeatherForecastType.FORECAST_HOURLY,
-                FORECAST_TWICE_DAILY: WeatherForecastType.FORECAST_TWICE_DAILY,
-                FORECAST_DAILY: WeatherForecastType.FORECAST_DAILY,
-            },
-            lower=True,
-        ),
         cv.Optional(CONF_TEMPERATURE_UOM, default="°C"): cv.string,
         cv.Required(CONF_CURRENT_TEMPERATURE_SENSOR_ID): cv.use_id(sensor.Sensor),
         cv.Required(CONF_CURRENT_CONDITION_SENSOR_ID): cv.use_id(
