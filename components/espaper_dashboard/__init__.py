@@ -1,5 +1,5 @@
 import esphome.codegen as cg
-from esphome.components import display
+from esphome.components import display, sensor, text_sensor
 import esphome.config_validation as cv
 from esphome.const import (
     CONF_BACKGROUND_COLOR,
@@ -37,6 +37,12 @@ WIDGET_SCHEMA_BASE = cv.Schema(
     },
 )
 
+
+CONF_TEMPERATURE_UOM = "temperature_uom"
+CONF_CURRENT_TEMPERATURE_SENSOR_ID = "current_temperature_sensor_id"
+CONF_CURRENT_CONDITION_SENSOR_ID = "current_condition_sensor_id"
+CONF_FORECAST_SENSOR_ID = "forecast_sensor_id"
+
 WeatherForecastType = espaper_dashboard_ns.enum("WeatherForecastType_t")
 FORECAST_HOURLY = "hourly"
 FORECAST_TWICE_DAILY = "twice_daily"
@@ -50,7 +56,13 @@ WEATHER_WIDGET_SCHEMA = WIDGET_SCHEMA_BASE.extend(
                 FORECAST_DAILY: WeatherForecastType.FORECAST_DAILY,
             },
             lower=True,
-        )
+        ),
+        cv.Optional(CONF_TEMPERATURE_UOM, default="°C"): cv.string,
+        cv.Required(CONF_CURRENT_TEMPERATURE_SENSOR_ID): cv.use_id(sensor.Sensor),
+        cv.Required(CONF_CURRENT_CONDITION_SENSOR_ID): cv.use_id(
+            text_sensor.TextSensor
+        ),
+        cv.Required(CONF_FORECAST_SENSOR_ID): cv.use_id(text_sensor.TextSensor),
     }
 )
 

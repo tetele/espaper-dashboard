@@ -59,6 +59,93 @@ Specific configuration:
   - **hourly**: Hourly forecast
   - **twice_daily**: Twice daily forecast
   - **daily**: Daily forecast
+- **temperature_uom** (*Optional*, `string`): The unit of measurement for the temperature. Defaults to `°C`.
+- **current_temperature_sensor_id** (**Required**, [Sensor](https://esphome.io/components/sensor/)): The ID of a `Sensor` containing the current temperature.
+- **current_condition_sensor_id** (**Required**, [TextSensor](https://esphome.io/components/text_sensor)): The ID of a `TextSensor` containing the current weather condition, which must be one of [these values](https://developers.home-assistant.io/docs/core/entity/weather#recommended-values-for-state-and-condition).
+- **forecast_sensor_id** (**Required**, [TextSensor](https://esphome.io/components/text_sensor)): The ID of a `TextSensor` containing a JSON with the forecast. The mandatory format of the JSON is:
+  - **forecast**: a list of objects containing forcasts, each with
+    - **label**: a string which designates the timeframe that the forecast describes (e.g. `23:00` or `Tuesday`)
+    - **condition**: a string [from this list](https://developers.home-assistant.io/docs/core/entity/weather#recommended-values-for-state-and-condition) containing the weather condition
+    - **temperature**: a numeric value representing the temperature for the forecast
+
+Here's an example `forecast` text sensor content:
+
+```json
+{
+  "forecast": [
+    {
+      "condition": "sunny",
+      "label": "12:00",
+      "temperature": 26.7
+    },
+    {
+      "condition": "sunny",
+      "label": "14:00",
+      "temperature": 28.5
+    },
+    {
+      "condition": "sunny",
+      "label": "16:00",
+      "temperature": 29.2
+    },
+    {
+      "condition": "partlycloudy",
+      "label": "18:00",
+      "temperature": 28.3
+    }
+  ]
+}
+```
+
+You can create such a sensor from HA using a template such as
+
+```yaml
+template:
+  - triggers:
+      - trigger: time_pattern
+        hours: /1
+      - trigger: event
+        event_type: manual_event_template_reloaded
+    actions:
+      - action: weather.get_forecasts
+        target:
+          entity_id: weather.home
+        data:
+          type: hourly
+        response_variable: forecast
+    sensor:
+      - name: Hourly weather forecast
+        state: "{{ now().isoformat() }}"
+        unique_id: hourly_weather_forecast
+        attributes:
+          current_condition: "{{ states('weather.home') }}"
+          current_temperature: "{{ state_attr('weather.home', 'temperature') }}"
+          temperature_uom: "{{ state_attr('weather.home', 'temperature_unit') }}"
+          forecast: >-
+            {% set forecast_attr = [
+              {
+                "label": as_timestamp(forecast['weather.home'].forecast[1].datetime) | timestamp_custom("%H:00"),
+                "condition": forecast['weather.home'].forecast[1].condition,
+                "temperature": forecast['weather.home'].forecast[1].temperature,
+              },
+              {
+                "label": as_timestamp(forecast['weather.home'].forecast[3].datetime) | timestamp_custom("%H:00"),
+                "condition": forecast['weather.home'].forecast[3].condition,
+                "temperature": forecast['weather.home'].forecast[3].temperature,
+              },
+              {
+                "label": as_timestamp(forecast['weather.home'].forecast[5].datetime) | timestamp_custom("%H:00"),
+                "condition": forecast['weather.home'].forecast[5].condition,
+                "temperature": forecast['weather.home'].forecast[5].temperature,
+              },
+              {
+                "label": as_timestamp(forecast['weather.home'].forecast[7].datetime) | timestamp_custom("%H:00"),
+                "condition": forecast['weather.home'].forecast[7].condition,
+                "temperature": forecast['weather.home'].forecast[7].temperature,
+              },
+            ] %}
+            {{ {'forecast': forecast_attr} | tojson }}
+```
 
 ## Usage
 

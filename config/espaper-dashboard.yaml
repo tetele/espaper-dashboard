@@ -85,9 +85,29 @@ espaper_dashboard:
     - id: weather_today
       type: weather
       forecast_type: hourly
-    - id: weather_tomorrow
-      type: weather
-      forecast_type: twice_daily
+      current_condition_sensor_id: weather_current_condition
+      current_temperature_sensor_id: weather_current_temperature
+      forecast_sensor_id: weather_hourly_forecast
+    # - id: weather_tomorrow
+    #   type: weather
+    #   forecast_type: twice_daily
+
+sensor:
+  - platform: homeassistant
+    id: weather_current_temperature
+    entity_id: sensor.hourly_weather_forecast
+    attribute: current_temperature
+
+text_sensor:
+  - platform: homeassistant
+    id: weather_current_condition
+    name: Weather current condition
+    entity_id: sensor.hourly_weather_forecast
+    attribute: current_condition
+  - platform: homeassistant
+    id: weather_hourly_forecast
+    entity_id: sensor.hourly_weather_forecast
+    attribute: forecast
 
 binary_sensor:
   - id: space_key
