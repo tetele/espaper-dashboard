@@ -15,8 +15,8 @@
     // uncomment and edit the path in order to pass though local USB serial to the conatiner
     // , "--device=/dev/ttyACM0"
   ],
-  // uncomment if you want to be able to access the ESPHome dashboard at http://localhost:6052
-  // "appPort": 6052,
+  // port for connecting HA to the display, so that it can grab sensor values
+  "appPort": 6053,
   // if you are using avahi in the host device, uncomment these to allow the
   // devcontainer to find devices via mdns
   //"mounts": [

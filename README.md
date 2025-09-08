@@ -2,6 +2,12 @@
 
 An [ESPHome](http://esphome.io) component meant to be used with e-paper displays in order to create informative dashboards.
 
+It is recommended to test using the [SDL2 component](https://esphome.io/components/display/sdl/#sdl) for the [`host` platform](https://esphome.io/components/host/) in ESPHome, so that compile times are greatly reduced.
+
+To test with real Home Assistant data, the `host` platform can be connected to a HA instance on port `6053`, which is forwarded in the devcontainer. However, keep in mind that firewalls may play a part and that you are responsible to facilitate HA to connect to the port on your development machine.
+
+The component is included as follows.
+
 ```yaml
 external_components:
   - source: github://tetele/espaper-dashboard@main
