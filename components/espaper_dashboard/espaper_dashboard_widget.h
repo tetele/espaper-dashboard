@@ -32,6 +32,24 @@ typedef enum {
     FORECAST_HOURLY,
 } WeatherForecastType;
 
+typedef enum {
+    CONDITION_CLEAR_NIGHT,
+    CONDITION_CLOUDY,
+    CONDITION_EXCEPTIONAL,
+    CONDITION_FOG,
+    CONDITION_HAIL,
+    CONDITION_LIGHTNING,
+    CONDITION_LIGHTNING_RAINY,
+    CONDITION_PARTLYCLOUDY,
+    CONDITION_POURING,
+    CONDITION_RAINY,
+    CONDITION_SNOWY,
+    CONDITION_SNOWY_RAINY,
+    CONDITION_SUNNY,
+    CONDITION_WINDY,
+    CONDITION_WINDY_VARIANT,
+} WeatherCondition;
+
 class WeatherWidget : public ESPaperDashboardWidget {
 public:
     void draw(int start_x, int start_y) override;
@@ -41,6 +59,10 @@ public:
 
 protected:
     WeatherForecastType forecast_type_{FORECAST_HOURLY};
+
+    WeatherCondition str_to_condition_(std::string condition);
+    std::string condition_to_icon_(WeatherCondition condition);
+    std::string condition_to_icon_(std::string condition);
 };
 
 } // namespace espaper_dashboard

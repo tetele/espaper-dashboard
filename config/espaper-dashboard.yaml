@@ -54,7 +54,19 @@ font:
       - GF_Latin_Kernel
   - id: glyph_font
     file: gfonts://Material+Symbols
-    size: 20
+    glyphs: &mdi-weather-glyphs
+      - "\ue2bd" # CONDITION_CLOUDY
+      - "\ue818" # CONDITION_FOG
+      - "\uf67f" # CONDITION_HAIL
+      - "\uebdb" # CONDITION_LIGHTNING, CONDITION_LIGHTNING_RAINY
+      - "\uef44" # CONDITION_CLEAR_NIGHT
+      - "\uf172" # CONDITION_PARTLYCLOUDY
+      - "\uf61f" # CONDITION_POURING
+      - "\uf176" # CONDITION_RAINY
+      - "\ue2cd" # CONDITION_SNOWY
+      - "\uf61d" # CONDITION_SNOWY_RAINY
+      - "\ue81a" # CONDITION_SUNNY
+      - "\uefd8" # CONDITION_WINDY, CONDITION_WINDY_VARIANT
   - id: glyph_font_large
     file: gfonts://Material+Symbols+Outlined
     size: 42
