@@ -63,7 +63,7 @@ Specific configuration:
 - **current_temperature_sensor_id** (**Required**, [Sensor](https://esphome.io/components/sensor/)): The ID of a `Sensor` containing the current temperature.
 - **current_condition_sensor_id** (**Required**, [TextSensor](https://esphome.io/components/text_sensor)): The ID of a `TextSensor` containing the current weather condition, which must be one of [these values](https://developers.home-assistant.io/docs/core/entity/weather#recommended-values-for-state-and-condition).
 - **forecast_sensor_id** (**Required**, [TextSensor](https://esphome.io/components/text_sensor)): The ID of a `TextSensor` containing a JSON with the forecast. The mandatory format of the JSON is:
-  - **forecast**: a list of objects containing forcasts, each with
+  - **forecast**: a list of objects containing forcasts. The max size of the list is hard-coded to 5. Each forecast item contains
     - **label**: a string which designates the timeframe that the forecast describes (e.g. `23:00` or `Tuesday`)
     - **condition**: a string [from this list](https://developers.home-assistant.io/docs/core/entity/weather#recommended-values-for-state-and-condition) containing the weather condition
     - **temperature**: a numeric value representing the temperature for the forecast

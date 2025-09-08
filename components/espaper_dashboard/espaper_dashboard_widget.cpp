@@ -1,5 +1,6 @@
 #include "espaper_dashboard_widget.h"
 #include "esphome/core/log.h"
+#include "esphome/components/json/json_util.h"
 
 #include <map>
 
@@ -9,6 +10,10 @@ namespace esphome {
 namespace espaper_dashboard {
 
 static const char *TAG = "espaper_dashboard.widget";
+static const char *FORECAST_ROOT_NODE = "forecast";
+static const char *FORECAST_LABEL_NODE = "label";
+static const char *FORECAST_TEMPERATURE_NODE = "temperature";
+static const char *FORECAST_CONDITION_NODE = "condition";
 
 void ESPaperDashboardWidget::set_size(int width, int height) {
     if(width > this->get_display_()->get_width() || height > this->get_display_()->get_height()) {
@@ -26,26 +31,69 @@ bool ESPaperDashboardWidget::should_draw() {
     return true;
 }
 
+struct WeatherStatus {
+    std::string title;
+    float temperature;
+    WeatherCondition condition;
+
+    WeatherStatus(std::string p_title, float p_temperature, WeatherCondition p_condition)
+        : title(std::move(p_title)), temperature(p_temperature), condition(p_condition)
+    {}
+
+    WeatherStatus(WeatherStatus&& other)
+        : title(std::move(other.title)), temperature(other.temperature), condition(other.condition)
+    {}
+
+    WeatherStatus& operator=(const WeatherStatus& other) = default;
+};
+
 void WeatherWidget::draw(int start_x, int start_y) {
     display::Display *it = this->get_display_();
 
-    // TODO - this is just a placeholder for now
-
     // current condition icon
-    it->filled_rectangle(start_x+this->width_/6, start_y+this->height_/6, this->width_/6, this->height_/3, this->target_->get_light_color());
-    // current temperature
-    it->filled_rectangle(start_x+this->width_/2, start_y+this->height_/6, this->width_/6, this->height_/3, this->target_->get_foreground_color());
+    it->printf(start_x+this->width_/3, start_y+this->height_/4, this->target_->get_large_glyph_font(), this->target_->get_light_color(), display::TextAlign::CENTER_RIGHT, "%s", this->condition_to_icon_(this->current_condition_sensor_->state).c_str());
     // current temperature UOM
-    it->filled_rectangle(start_x+2*this->width_/3, start_y+this->height_/6, this->width_/6, this->height_/3, this->target_->get_dark_color());
+    it->printf(start_x+this->width_/2, start_y+this->height_/4, this->target_->get_large_font(), this->target_->get_dark_color(), display::TextAlign::CENTER_LEFT, "%.1f%s", this->current_temperature_sensor_->state, this->temperature_uom_.c_str());
+    // current temperature
+    it->printf(start_x+this->width_/2, start_y+this->height_/4, this->target_->get_large_font(), this->target_->get_foreground_color(), display::TextAlign::CENTER_LEFT, "%.1f", this->current_temperature_sensor_->state);
 
-    for(int i=0; i<4; i++) {
+    std::vector<WeatherStatus> forecast;
+
+    json::parse_json(this->forecast_sensor_->state, [&forecast, this](JsonObject root) -> bool {
+        auto new_forecast = root[FORECAST_ROOT_NODE];
+        if(!new_forecast) {
+            ESP_LOGW(TAG, "Invalid forecast object structure. See documentation.");
+            return false;
+        }
+        for(int i=0; i<new_forecast.size() && i<5; i++) {
+            if(!new_forecast[i] || !new_forecast[i][FORECAST_TEMPERATURE_NODE] || !new_forecast[i][FORECAST_CONDITION_NODE] || !new_forecast[i][FORECAST_LABEL_NODE]) {
+                ESP_LOGW(TAG, "Invalid forecast object structure. See documentation.");
+                return false;
+            }
+            forecast.push_back(WeatherStatus(
+                new_forecast[i][FORECAST_LABEL_NODE].as<std::string>(),
+                new_forecast[i][FORECAST_TEMPERATURE_NODE].as<float>(),
+                this->str_to_condition_(new_forecast[i][FORECAST_CONDITION_NODE].as<const char*>())
+            ));
+        }
+        return true;
+    });
+
+    int i=1, n=(forecast.size()+2)*2;
+    for(const WeatherStatus& interval : forecast) {
         // forcast timespan
-        it->filled_rectangle(start_x+(i+1)*this->width_/6, start_y+this->height_/2, this->width_/6, this->height_/6, this->target_->get_dark_color());
+        it->printf((i*2+1)*this->width_/n, start_y+this->height_/2, this->target_->get_default_font(), this->target_->get_dark_color(), display::TextAlign::TOP_CENTER, "%s", interval.title.c_str());
         // forecast condition icon
-        it->filled_rectangle(start_x+(i+1)*this->width_/6, start_y+2*this->height_/3, this->width_/6, this->height_/6, this->target_->get_light_color());
-        // forecast temperature
-        it->filled_rectangle(start_x+(i+1)*this->width_/6, start_y+5*this->height_/6, this->width_/6, this->height_/6, this->target_->get_foreground_color());
+        it->printf((i*2+1)*this->width_/n, start_y+2*this->height_/3, this->target_->get_glyph_font(), this->target_->get_light_color(), display::TextAlign::TOP_CENTER, "%s", this->condition_to_icon_(interval.condition).c_str());
         // forecast temperature UOM
+        int x, y, w, h;
+        char t[20];
+        sprintf(t, "%.1f%s", interval.temperature, this->temperature_uom_.c_str());
+        it->get_text_bounds(start_x+(i*2+1)*this->width_/n, start_y+5*this->height_/6, t, this->target_->get_default_font(), display::TextAlign::TOP_CENTER, &x, &y, &w, &h);
+        it->printf(x, y, this->target_->get_default_font(), this->target_->get_dark_color(), display::TextAlign::TOP_LEFT, "%.1f°C", interval.temperature);
+        // forecast temperature
+        it->printf(x, y, this->target_->get_default_font(), this->target_->get_foreground_color(), display::TextAlign::TOP_LEFT, "%.1f", interval.temperature);
+        i++;
     }
 }
 

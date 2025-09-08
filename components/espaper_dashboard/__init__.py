@@ -9,6 +9,8 @@ from esphome.const import (
     CONF_TYPE,
 )
 
+AUTO_LOAD = ["json"]
+
 CONF_LABEL_COLOR = "label_color"
 CONF_LIGHT_COLOR = "light_color"
 CONF_DARK_COLOR = "dark_color"
