@@ -141,5 +141,8 @@ async def to_code(config):
 
         for k, v in widget_conf.items():
             if k not in (CONF_ID, CONF_SHOULD_DRAW, CONF_TYPE):
+                if k.endswith("_id"):
+                    v = await cg.get_variable(v)
+                    k = k[:-3]
                 method = getattr(widget, "set_" + k)
                 cg.add(method(v))
