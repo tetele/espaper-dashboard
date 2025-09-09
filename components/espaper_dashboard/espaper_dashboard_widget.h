@@ -67,5 +67,18 @@ protected:
     std::string condition_to_icon_(std::string condition);
 };
 
+class MessageWidget : public ESPaperDashboardWidget {
+public:
+    void draw(int start_x, int start_y) override;
+    void init_size() override;
+
+    void set_icon(std::string icon) { this->icon_ = icon; };
+    void set_message(std::function<std::string()> &&message) { this->message_ = message; };
+
+protected:
+    std::string icon_{""};
+    optional<std::function<std::string()>> message_{};
+};
+
 } // namespace espaper_dashboard
 } // namespace esphome

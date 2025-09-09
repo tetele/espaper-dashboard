@@ -5,6 +5,7 @@ from esphome.const import (
     CONF_BACKGROUND_COLOR,
     CONF_DISPLAY_ID,
     CONF_FOREGROUND_COLOR,
+    CONF_ICON,
     CONF_ID,
     CONF_TYPE,
 )
@@ -26,6 +27,7 @@ ESPaperDashboard = espaper_dashboard_ns.class_("ESPaperDashboard", cg.Component)
 ESPaperDashboardWidget = espaper_dashboard_ns.class_("ESPaperDashboardWidget")
 
 WeatherWidget = espaper_dashboard_ns.class_("WeatherWidget", ESPaperDashboardWidget)
+MessageWidget = espaper_dashboard_ns.class_("MessageWidget", ESPaperDashboardWidget)
 
 Color = cg.esphome_ns.class_("Color")
 Font = cg.esphome_ns.namespace("font").class_("Font")
@@ -54,8 +56,18 @@ WEATHER_WIDGET_SCHEMA = WIDGET_SCHEMA_BASE.extend(
     }
 )
 
+CONF_MESSAGE_LAMBDA = "message_lambda"
+
+MESSAGE_WIDGET_SCHEMA = WIDGET_SCHEMA_BASE.extend(
+    {
+        cv.Required(CONF_ICON): cv.string,
+        cv.Required(CONF_MESSAGE_LAMBDA): cv.returning_lambda,
+    }
+)
+
 WIDGET_TYPES = {
     "weather": (WeatherWidget, WEATHER_WIDGET_SCHEMA),
+    "message": (MessageWidget, MESSAGE_WIDGET_SCHEMA),
 }
 
 WIDGET_SCHEMA = cv.typed_schema(
@@ -144,5 +156,8 @@ async def to_code(config):
                 if k.endswith("_id"):
                     v = await cg.get_variable(v)
                     k = k[:-3]
+                elif k.endswith("_lambda"):
+                    v = await cg.process_lambda(v, [], return_type=cg.std_string)
+                    k = k[:-7]
                 method = getattr(widget, "set_" + k)
                 cg.add(method(v))

@@ -82,6 +82,10 @@ espaper_dashboard:
   glyph_font: glyph_font
   large_glyph_font: glyph_font_large
   widgets:
+    - id: urgent_message
+      type: message
+      icon: "\uf61d"
+      message_lambda: !lambda 'return "Downpour expected";'
     - id: weather_today
       type: weather
       forecast_type: hourly
