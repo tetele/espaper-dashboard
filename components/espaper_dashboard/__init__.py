@@ -5,10 +5,12 @@ from esphome.const import (
     CONF_BACKGROUND_COLOR,
     CONF_DISPLAY_ID,
     CONF_FOREGROUND_COLOR,
+    CONF_HEIGHT,
     CONF_ICON,
     CONF_ID,
     CONF_MESSAGE,
     CONF_TYPE,
+    CONF_WIDTH,
 )
 
 AUTO_LOAD = ["json"]
@@ -37,6 +39,8 @@ WIDGET_SCHEMA_BASE = cv.Schema(
     {
         cv.GenerateID(CONF_ID): cv.declare_id(ESPaperDashboardWidget),
         cv.Optional(CONF_SHOULD_DRAW): cv.templatable(cv.boolean),
+        cv.Optional(CONF_WIDTH): cv.templatable(cv.Range(min=1)),
+        cv.Optional(CONF_HEIGHT): cv.templatable(cv.Range(min=1)),
     },
 )
 
@@ -150,8 +154,14 @@ async def to_code(config):
 
             cg.add(widget.set_should_draw(should_draw))
 
+        if CONF_WIDTH in widget_conf and CONF_HEIGHT in widget_conf:
+            width = await cg.templatable(widget_conf[CONF_WIDTH], [], cg.int_)
+            height = await cg.templatable(widget_conf[CONF_HEIGHT], [], cg.int_)
+            cg.add(widget.set_width(width))
+            cg.add(widget.set_height(height))
+
         for k, v in widget_conf.items():
-            if k not in (CONF_ID, CONF_SHOULD_DRAW, CONF_TYPE):
+            if k not in (CONF_ID, CONF_SHOULD_DRAW, CONF_TYPE, CONF_WIDTH, CONF_HEIGHT):
                 if k.endswith("_id"):
                     v = await cg.get_variable(v)
                     k = k[:-3]

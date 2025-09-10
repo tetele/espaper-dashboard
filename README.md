@@ -42,6 +42,8 @@ espaper_dashboard: # component name
   widgets: # list of widgets
     - id: weather_today
       should_draw: !lambda 'return true;' # common to all widgets, optional, defaults to true
+      width: 480 # common to all widgets, optional, templatable
+      height: !lambda 'return 200;' # common to all widgets, optional, templatable
       type: weather # required
       current_condition_sensor_id: weather_current_condition
       current_temperature_sensor_id: weather_current_temperature
@@ -53,6 +55,8 @@ espaper_dashboard: # component name
 - **id** (*Optional*, [ID](https://www.esphome.io/guides/configuration-types#config-id)): The ID of the widget
 - **should_draw** (*Optional*, [templatable](https://esphome.io/automations/templates#config-templatable)): A `bool` value or a lambda returning a `bool` which dictates whether the widget should be rendered or not on the next dashboard update. Defaults to `true` (widget will render).
 - **type** (**Required**): The type of widget. See below
+- **width** (*Optional*, [templatable](https://esphome.io/automations/templates#config-templatable)): The desired width of the widget. All widgets have internal, default sizes based on type.
+- **height** (*Optional*, [templatable](https://esphome.io/automations/templates#config-templatable)): The desired height of the widget. All widgets have internal, default sizes based on type.
 
 ### Types of widgets
 

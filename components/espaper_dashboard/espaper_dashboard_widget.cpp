@@ -15,16 +15,6 @@ static const char *FORECAST_LABEL_NODE = "label";
 static const char *FORECAST_TEMPERATURE_NODE = "temperature";
 static const char *FORECAST_CONDITION_NODE = "condition";
 
-void ESPaperDashboardWidget::set_size(int width, int height) {
-    if(width > this->get_display_()->get_width() || height > this->get_display_()->get_height()) {
-        ESP_LOGW(TAG, "Cannot set widget dimensions larger than the display it is shown on: %dx%d > %dx%d", width, height, this->get_display_()->get_width(), this->get_display_()->get_height());
-        return;
-    }
-
-    this->width_ = width;
-    this->height_ = height;
-}
-
 bool ESPaperDashboardWidget::should_draw() {
     if (this->should_draw_.has_value())
         return this->should_draw_.value();
@@ -51,11 +41,11 @@ void WeatherWidget::draw(int start_x, int start_y) {
     display::Display *it = this->get_display_();
 
     // current condition icon
-    it->printf(start_x+this->width_/3, start_y+this->height_/4, this->target_->get_large_glyph_font(), this->target_->get_light_color(), display::TextAlign::CENTER_RIGHT, "%s", this->condition_to_icon_(this->current_condition_sensor_->state).c_str());
+    it->printf(start_x+this->width_.value()/3, start_y+this->height_.value()/4, this->target_->get_large_glyph_font(), this->target_->get_light_color(), display::TextAlign::CENTER_RIGHT, "%s", this->condition_to_icon_(this->current_condition_sensor_->state).c_str());
     // current temperature UOM
-    it->printf(start_x+this->width_/2, start_y+this->height_/4, this->target_->get_large_font(), this->target_->get_dark_color(), display::TextAlign::CENTER_LEFT, "%.1f%s", this->current_temperature_sensor_->state, this->temperature_uom_.c_str());
+    it->printf(start_x+this->width_.value()/2, start_y+this->height_.value()/4, this->target_->get_large_font(), this->target_->get_dark_color(), display::TextAlign::CENTER_LEFT, "%.1f%s", this->current_temperature_sensor_->state, this->temperature_uom_.c_str());
     // current temperature
-    it->printf(start_x+this->width_/2, start_y+this->height_/4, this->target_->get_large_font(), this->target_->get_foreground_color(), display::TextAlign::CENTER_LEFT, "%.1f", this->current_temperature_sensor_->state);
+    it->printf(start_x+this->width_.value()/2, start_y+this->height_.value()/4, this->target_->get_large_font(), this->target_->get_foreground_color(), display::TextAlign::CENTER_LEFT, "%.1f", this->current_temperature_sensor_->state);
 
     std::vector<WeatherStatus> forecast;
 
@@ -82,14 +72,14 @@ void WeatherWidget::draw(int start_x, int start_y) {
     int i=1, n=(forecast.size()+2)*2;
     for(const WeatherStatus& interval : forecast) {
         // forcast timespan
-        it->printf((i*2+1)*this->width_/n, start_y+this->height_/2, this->target_->get_default_font(), this->target_->get_dark_color(), display::TextAlign::TOP_CENTER, "%s", interval.title.c_str());
+        it->printf((i*2+1)*this->width_.value()/n, start_y+this->height_.value()/2, this->target_->get_default_font(), this->target_->get_dark_color(), display::TextAlign::TOP_CENTER, "%s", interval.title.c_str());
         // forecast condition icon
-        it->printf((i*2+1)*this->width_/n, start_y+2*this->height_/3, this->target_->get_glyph_font(), this->target_->get_light_color(), display::TextAlign::TOP_CENTER, "%s", this->condition_to_icon_(interval.condition).c_str());
+        it->printf((i*2+1)*this->width_.value()/n, start_y+2*this->height_.value()/3, this->target_->get_glyph_font(), this->target_->get_light_color(), display::TextAlign::TOP_CENTER, "%s", this->condition_to_icon_(interval.condition).c_str());
         // forecast temperature UOM
         int x, y, w, h;
         char t[20];
         sprintf(t, "%.1f%s", interval.temperature, this->temperature_uom_.c_str());
-        it->get_text_bounds(start_x+(i*2+1)*this->width_/n, start_y+5*this->height_/6, t, this->target_->get_default_font(), display::TextAlign::TOP_CENTER, &x, &y, &w, &h);
+        it->get_text_bounds(start_x+(i*2+1)*this->width_.value()/n, start_y+5*this->height_.value()/6, t, this->target_->get_default_font(), display::TextAlign::TOP_CENTER, &x, &y, &w, &h);
         it->printf(x, y, this->target_->get_default_font(), this->target_->get_dark_color(), display::TextAlign::TOP_LEFT, "%.1f°C", interval.temperature);
         // forecast temperature
         it->printf(x, y, this->target_->get_default_font(), this->target_->get_foreground_color(), display::TextAlign::TOP_LEFT, "%.1f", interval.temperature);
@@ -98,8 +88,8 @@ void WeatherWidget::draw(int start_x, int start_y) {
 }
 
 void WeatherWidget::init_size() {
-    this->width_ = this->get_display_()->get_width();
-    this->height_ = this->width_*7/16;
+    if(!this->width_.has_value() || !this->width_.value()) this->width_ = this->get_display_()->get_width();
+    if(!this->height_.has_value() || !this->height_.value()) this->height_ = this->width_.value()*7/16;
 }
 
 WeatherCondition WeatherWidget::str_to_condition_(std::string condition) {
@@ -156,19 +146,20 @@ std::string WeatherWidget::condition_to_icon_(std::string condition) {
 
     if(this->icon_.has_value()) {
         // icon
-        it->printf(start_x+this->width_/10, start_y+this->height_/2, this->target_->get_large_glyph_font(), this->target_->get_light_color(), display::TextAlign::CENTER, "%s", this->icon_.value().c_str());
+        it->printf(start_x+this->width_.value()/10, start_y+this->height_.value()/2, this->target_->get_large_glyph_font(), this->target_->get_light_color(), display::TextAlign::CENTER, "%s", this->icon_.value().c_str());
         // message
-        it->printf(start_x+this->width_*3/10, start_y+this->height_/2, this->target_->get_large_font(), this->target_->get_foreground_color(), display::TextAlign::CENTER_LEFT, "%s", this->message_.value().c_str());
+        it->printf(start_x+this->width_.value()*3/10, start_y+this->height_.value()/2, this->target_->get_large_font(), this->target_->get_foreground_color(), display::TextAlign::CENTER_LEFT, "%s", this->message_.value().c_str());
     } else {
         // message
-        it->printf(start_x+this->width_/10, start_y+this->height_/2, this->target_->get_large_font(), this->target_->get_foreground_color(), display::TextAlign::CENTER_LEFT, "%s", this->message_.value().c_str());
+        it->printf(start_x+this->width_.value()/10, start_y+this->height_.value()/2, this->target_->get_large_font(), this->target_->get_foreground_color(), display::TextAlign::CENTER_LEFT, "%s", this->message_.value().c_str());
     }
 
 }
 
 void MessageWidget::init_size() {
-    this->width_ = this->get_display_()->get_width();
-    this->height_ = this->width_/4;
+    ESP_LOGD(TAG, "width has value: %s (%d), height has value: %s", YESNO(this->width_.has_value()), this->width_.value(), YESNO(this->height_.has_value()));
+    if(!this->width_.has_value() || !this->width_.value()) this->width_ = this->get_display_()->get_width();
+    if(!this->height_.has_value() || !this->height_.value()) this->height_ = this->width_.value()/4;
 }
 
 }

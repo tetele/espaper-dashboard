@@ -13,16 +13,17 @@ public:
     virtual void init_size() = 0;
 
     void set_target(ESPaperDashboard *target) { this->target_ = target; };
-    void set_size(int width, int height);
-    int get_width() { return this->width_; };
-    int get_height() { return this->height_; };
+    template<typename T> void set_width(T width) { this->width_ = width; };
+    int get_width() { return this->width_.value(); };
+    template<typename T> void set_height(T height) { this->height_ = height; };
+    int get_height() { return this->height_.value(); };
     template<typename T> void set_should_draw(T should_draw) { this->should_draw_ = should_draw; };
     bool should_draw();
 
 protected:
     ESPaperDashboard *target_{nullptr};
-    int width_{0};
-    int height_{0};
+    TemplatableValue<int> width_{0};
+    TemplatableValue<int> height_{0};
     TemplatableValue<bool> should_draw_{};
 
     display::Display *get_display_() { return this->target_->get_display(); };
