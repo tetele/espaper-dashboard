@@ -148,6 +148,16 @@ template:
             {{ {'forecast': forecast_attr} | tojson }}
 ```
 
+### Message Widget
+
+Displays a message with an optional icon.
+
+Specific configuration:
+
+- **icon** (*Optional*, [templatable](https://esphome.io/automations/templates#config-templatable)): The character used for the icon
+- **message** (**Required**, [templatable](https://esphome.io/automations/templates#config-templatable)): The message to display
+
+
 ## Usage
 
 TODO

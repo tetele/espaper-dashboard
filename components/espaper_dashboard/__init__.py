@@ -5,7 +5,9 @@ from esphome.const import (
     CONF_BACKGROUND_COLOR,
     CONF_DISPLAY_ID,
     CONF_FOREGROUND_COLOR,
+    CONF_ICON,
     CONF_ID,
+    CONF_MESSAGE,
     CONF_TYPE,
 )
 
@@ -26,6 +28,7 @@ ESPaperDashboard = espaper_dashboard_ns.class_("ESPaperDashboard", cg.Component)
 ESPaperDashboardWidget = espaper_dashboard_ns.class_("ESPaperDashboardWidget")
 
 WeatherWidget = espaper_dashboard_ns.class_("WeatherWidget", ESPaperDashboardWidget)
+MessageWidget = espaper_dashboard_ns.class_("MessageWidget", ESPaperDashboardWidget)
 
 Color = cg.esphome_ns.class_("Color")
 Font = cg.esphome_ns.namespace("font").class_("Font")
@@ -54,8 +57,16 @@ WEATHER_WIDGET_SCHEMA = WIDGET_SCHEMA_BASE.extend(
     }
 )
 
+MESSAGE_WIDGET_SCHEMA = WIDGET_SCHEMA_BASE.extend(
+    {
+        cv.Optional(CONF_ICON): cv.templatable(cv.string),
+        cv.Required(CONF_MESSAGE): cv.templatable(cv.string),
+    }
+)
+
 WIDGET_TYPES = {
     "weather": (WeatherWidget, WEATHER_WIDGET_SCHEMA),
+    "message": (MessageWidget, MESSAGE_WIDGET_SCHEMA, [CONF_ICON, CONF_MESSAGE]),
 }
 
 WIDGET_SCHEMA = cv.typed_schema(
@@ -144,5 +155,9 @@ async def to_code(config):
                 if k.endswith("_id"):
                     v = await cg.get_variable(v)
                     k = k[:-3]
+                if (len(widget_type) > 2) and (
+                    k in widget_type[2]
+                ):  # if it's templateable
+                    v = await cg.templatable(v, [], cg.std_string)
                 method = getattr(widget, "set_" + k)
                 cg.add(method(v))
