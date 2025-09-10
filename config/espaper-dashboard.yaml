@@ -84,11 +84,10 @@ espaper_dashboard:
   widgets:
     - id: urgent_message
       type: message
-      icon: "\uf61d"
-      message_lambda: !lambda 'return "Downpour expected";'
+      # icon: "\uf61d"
+      message: !lambda 'return "Downpour expected";'
     - id: weather_today
       type: weather
-      forecast_type: hourly
       current_condition_sensor_id: weather_current_condition
       current_temperature_sensor_id: weather_current_temperature
       forecast_sensor_id: weather_hourly_forecast
