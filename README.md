@@ -51,7 +51,7 @@ espaper_dashboard: # component name
 ### Widget configuration variables
 
 - **id** (*Optional*, [ID](https://www.esphome.io/guides/configuration-types#config-id)): The ID of the widget
-- **should_draw** (*Optional*, [lambda](https://www.esphome.io/automations/templates#config-lambda)): A lambda function used to specify whether the widget should render or not on the next dashboard update. If no lambda is set, the widget will render.
+- **should_draw** (*Optional*, [templatable](https://esphome.io/automations/templates#config-templatable)): A `bool` value or a lambda returning a `bool` which dictates whether the widget should be rendered or not on the next dashboard update. Defaults to `true` (widget will render).
 - **type** (**Required**): The type of widget. See below
 
 ### Types of widgets

@@ -36,7 +36,7 @@ Font = cg.esphome_ns.namespace("font").class_("Font")
 WIDGET_SCHEMA_BASE = cv.Schema(
     {
         cv.GenerateID(CONF_ID): cv.declare_id(ESPaperDashboardWidget),
-        cv.Optional(CONF_SHOULD_DRAW): cv.lambda_,
+        cv.Optional(CONF_SHOULD_DRAW): cv.templatable(cv.boolean),
     },
 )
 
@@ -144,11 +144,11 @@ async def to_code(config):
         cg.add(widget.set_target(var))
 
         if CONF_SHOULD_DRAW in widget_conf:
-            lambda_ = await cg.process_lambda(
-                widget_conf[CONF_SHOULD_DRAW], [], return_type=cg.bool_
+            should_draw = await cg.templatable(
+                widget_conf[CONF_SHOULD_DRAW], [], cg.bool_
             )
 
-            cg.add(widget.set_should_draw(lambda_))
+            cg.add(widget.set_should_draw(should_draw))
 
         for k, v in widget_conf.items():
             if k not in (CONF_ID, CONF_SHOULD_DRAW, CONF_TYPE):
