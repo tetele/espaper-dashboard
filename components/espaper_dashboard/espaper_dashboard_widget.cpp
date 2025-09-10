@@ -153,10 +153,17 @@ std::string WeatherWidget::condition_to_icon_(std::string condition) {
 }void MessageWidget::draw(int start_x, int start_y) {
     display::Display *it = this->get_display_();
 
-    // icon
-    it->printf(start_x+this->width_/10, start_y+this->height_/2, this->target_->get_large_glyph_font(), this->target_->get_light_color(), display::TextAlign::CENTER, "%s", this->icon_.c_str());
-    // message
-    it->printf(start_x+this->width_*3/10, start_y+this->height_/2, this->target_->get_large_font(), this->target_->get_foreground_color(), display::TextAlign::CENTER_LEFT, "%s", (*this->message_)().c_str());
+
+    if(this->icon_.has_value()) {
+        // icon
+        it->printf(start_x+this->width_/10, start_y+this->height_/2, this->target_->get_large_glyph_font(), this->target_->get_light_color(), display::TextAlign::CENTER, "%s", this->icon_.value().c_str());
+        // message
+        it->printf(start_x+this->width_*3/10, start_y+this->height_/2, this->target_->get_large_font(), this->target_->get_foreground_color(), display::TextAlign::CENTER_LEFT, "%s", this->message_.value().c_str());
+    } else {
+        // message
+        it->printf(start_x+this->width_/10, start_y+this->height_/2, this->target_->get_large_font(), this->target_->get_foreground_color(), display::TextAlign::CENTER_LEFT, "%s", this->message_.value().c_str());
+    }
+
 }
 
 void MessageWidget::init_size() {

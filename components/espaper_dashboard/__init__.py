@@ -7,6 +7,7 @@ from esphome.const import (
     CONF_FOREGROUND_COLOR,
     CONF_ICON,
     CONF_ID,
+    CONF_MESSAGE,
     CONF_TYPE,
 )
 
@@ -56,18 +57,16 @@ WEATHER_WIDGET_SCHEMA = WIDGET_SCHEMA_BASE.extend(
     }
 )
 
-CONF_MESSAGE_LAMBDA = "message_lambda"
-
 MESSAGE_WIDGET_SCHEMA = WIDGET_SCHEMA_BASE.extend(
     {
-        cv.Required(CONF_ICON): cv.string,
-        cv.Required(CONF_MESSAGE_LAMBDA): cv.returning_lambda,
+        cv.Optional(CONF_ICON): cv.templatable(cv.string),
+        cv.Required(CONF_MESSAGE): cv.templatable(cv.string),
     }
 )
 
 WIDGET_TYPES = {
     "weather": (WeatherWidget, WEATHER_WIDGET_SCHEMA),
-    "message": (MessageWidget, MESSAGE_WIDGET_SCHEMA),
+    "message": (MessageWidget, MESSAGE_WIDGET_SCHEMA, [CONF_ICON, CONF_MESSAGE]),
 }
 
 WIDGET_SCHEMA = cv.typed_schema(
@@ -156,8 +155,9 @@ async def to_code(config):
                 if k.endswith("_id"):
                     v = await cg.get_variable(v)
                     k = k[:-3]
-                elif k.endswith("_lambda"):
-                    v = await cg.process_lambda(v, [], return_type=cg.std_string)
-                    k = k[:-7]
+                if (len(widget_type) > 2) and (
+                    k in widget_type[2]
+                ):  # if it's templateable
+                    v = await cg.templatable(v, [], cg.std_string)
                 method = getattr(widget, "set_" + k)
                 cg.add(method(v))

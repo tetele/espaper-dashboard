@@ -72,12 +72,12 @@ public:
     void draw(int start_x, int start_y) override;
     void init_size() override;
 
-    void set_icon(std::string icon) { this->icon_ = icon; };
-    void set_message(std::function<std::string()> &&message) { this->message_ = message; };
+    template<typename T> void set_icon(T icon) { this->icon_ = icon; };
+    template<typename T> void set_message(T message) { this->message_ = message; };
 
 protected:
-    std::string icon_{""};
-    optional<std::function<std::string()>> message_{};
+    TemplatableValue<std::string> icon_{};
+    TemplatableValue<std::string> message_{};
 };
 
 } // namespace espaper_dashboard
