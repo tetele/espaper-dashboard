@@ -54,6 +54,7 @@ espaper_dashboard: # component name
 
 - **id** (*Optional*, [ID](https://www.esphome.io/guides/configuration-types#config-id)): The ID of the widget
 - **should_draw** (*Optional*, [templatable](https://esphome.io/automations/templates#config-templatable)): A `bool` value or a lambda returning a `bool` which dictates whether the widget should be rendered or not on the next dashboard update. Defaults to `true` (widget will render).
+- **priority** (*Optional*, [templatable](https://esphome.io/automations/templates#config-templatable)): A numeric priority template for sorting widgets in the dashboard. The larger the number, the higher the priority, the sooner the widget will be rendered. Defaults to `0`.
 - **type** (**Required**): The type of widget. See below
 - **width** (*Optional*, [templatable](https://esphome.io/automations/templates#config-templatable)): The desired width of the widget. All widgets have internal, default sizes based on type.
 - **height** (*Optional*, [templatable](https://esphome.io/automations/templates#config-templatable)): The desired height of the widget. All widgets have internal, default sizes based on type.

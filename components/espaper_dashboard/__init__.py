@@ -9,6 +9,7 @@ from esphome.const import (
     CONF_ICON,
     CONF_ID,
     CONF_MESSAGE,
+    CONF_PRIORITY,
     CONF_TYPE,
     CONF_WIDTH,
 )
@@ -39,6 +40,7 @@ WIDGET_SCHEMA_BASE = cv.Schema(
     {
         cv.GenerateID(CONF_ID): cv.declare_id(ESPaperDashboardWidget),
         cv.Optional(CONF_SHOULD_DRAW): cv.templatable(cv.boolean),
+        cv.Optional(CONF_PRIORITY): cv.templatable(cv.int_),
         cv.Optional(CONF_WIDTH): cv.templatable(cv.Range(min=1)),
         cv.Optional(CONF_HEIGHT): cv.templatable(cv.Range(min=1)),
     },
@@ -154,6 +156,11 @@ async def to_code(config):
 
             cg.add(widget.set_should_draw(should_draw))
 
+        if CONF_PRIORITY in widget_conf:
+            priority = await cg.templatable(widget_conf[CONF_PRIORITY], [], cg.int_)
+
+            cg.add(widget.set_priority(priority))
+
         if CONF_WIDTH in widget_conf and CONF_HEIGHT in widget_conf:
             width = await cg.templatable(widget_conf[CONF_WIDTH], [], cg.int_)
             height = await cg.templatable(widget_conf[CONF_HEIGHT], [], cg.int_)
@@ -161,7 +168,14 @@ async def to_code(config):
             cg.add(widget.set_height(height))
 
         for k, v in widget_conf.items():
-            if k not in (CONF_ID, CONF_SHOULD_DRAW, CONF_TYPE, CONF_WIDTH, CONF_HEIGHT):
+            if k not in (
+                CONF_ID,
+                CONF_SHOULD_DRAW,
+                CONF_PRIORITY,
+                CONF_TYPE,
+                CONF_WIDTH,
+                CONF_HEIGHT,
+            ):
                 if k.endswith("_id"):
                     v = await cg.get_variable(v)
                     k = k[:-3]

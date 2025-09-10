@@ -19,12 +19,15 @@ public:
     int get_height() { return this->height_.value(); };
     template<typename T> void set_should_draw(T should_draw) { this->should_draw_ = should_draw; };
     bool should_draw();
+    template<typename T> void set_priority(T priority) { this->priority_ = priority; };
+    int get_priority() { return this->priority_.value(); };
 
 protected:
     ESPaperDashboard *target_{nullptr};
     TemplatableValue<int> width_{0};
     TemplatableValue<int> height_{0};
     TemplatableValue<bool> should_draw_{};
+    TemplatableValue<int> priority_{};
 
     display::Display *get_display_() { return this->target_->get_display(); };
 };

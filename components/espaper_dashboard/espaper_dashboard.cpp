@@ -35,7 +35,12 @@ void ESPaperDashboard::draw() {
     this->display_->fill(this->get_background_color());
 
     int total_height = 0;
-    for(auto widget : this->widgets_) {
+    std::vector<ESPaperDashboardWidget*> sorted_widgets = this->widgets_;
+    auto compare_priorities = [](ESPaperDashboardWidget *a, ESPaperDashboardWidget *b) {
+        return (a->get_priority() > b->get_priority());
+    };
+    std::sort(sorted_widgets.begin(), sorted_widgets.end(), compare_priorities);
+    for(auto widget : sorted_widgets) {
         if(total_height + widget->get_height() > this->display_->get_height()) break;
         if(!widget->should_draw()) continue;
 

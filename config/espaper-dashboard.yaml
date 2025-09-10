@@ -91,9 +91,7 @@ espaper_dashboard:
       current_condition_sensor_id: weather_current_condition
       current_temperature_sensor_id: weather_current_temperature
       forecast_sensor_id: weather_hourly_forecast
-    # - id: weather_tomorrow
-    #   type: weather
-    #   forecast_type: twice_daily
+      priority: 2
 
 sensor:
   - platform: homeassistant
