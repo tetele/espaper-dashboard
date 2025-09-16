@@ -2,15 +2,18 @@ from typing import Any
 
 import esphome.codegen as cg
 from esphome.components import sensor, text_sensor
-import esphome.config_validation as cv
-from esphome.const import CONF_ICON, CONF_MESSAGE
-
-from . import (
+from esphome.components.espaper_dashboard import (
     WIDGET_SCHEMA_BASE,
     ESPaperDashboardWidget,
     espaper_dashboard_ns,
     supported_widgets,
 )
+import esphome.config_validation as cv
+from esphome.const import CONF_ICON, CONF_MESSAGE
+
+DEPENDENCIES = ["espaper_dashboard"]
+
+CONFIG_SCHEMA = cv.Schema({})
 
 WeatherWidget = espaper_dashboard_ns.class_("WeatherWidget", ESPaperDashboardWidget)
 MessageWidget = espaper_dashboard_ns.class_("MessageWidget", ESPaperDashboardWidget)

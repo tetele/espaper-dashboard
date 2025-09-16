@@ -1,6 +1,6 @@
 #pragma once
 
-#include "espaper_dashboard_widget.h"
+#include "esphome/components/espaper_dashboard/espaper_dashboard_widget.h"
 
 namespace esphome {
 namespace espaper_dashboard {

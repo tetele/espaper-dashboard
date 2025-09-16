@@ -15,7 +15,7 @@ from esphome.const import (
     CONF_WIDTH,
 )
 
-AUTO_LOAD = ["json"]
+AUTO_LOAD = ["json", "espaper_dashboard_widgets"]
 
 CONF_LABEL_COLOR = "label_color"
 CONF_LIGHT_COLOR = "light_color"
@@ -184,7 +184,3 @@ async def to_code(config):
 
     for widget_conf in config[CONF_WIDGETS]:
         await supported_widgets.to_code(var, widget_conf)
-
-
-# pylint: disable-next=wrong-import-position
-from . import builtin_widgets  # noqa: E402, F401

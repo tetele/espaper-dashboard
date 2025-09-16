@@ -7,7 +7,7 @@
 namespace esphome {
 namespace espaper_dashboard {
 
-static const char *TAG = "espaper_dashboard.weather_widget";
+static const char *TAG = "espaper_dashboard_widgets.weather_widget";
 
 static const char *FORECAST_ROOT_NODE = "forecast";
 static const char *FORECAST_LABEL_NODE = "label";

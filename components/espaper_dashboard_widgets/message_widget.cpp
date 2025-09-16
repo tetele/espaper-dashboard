@@ -6,7 +6,7 @@
 namespace esphome {
 namespace espaper_dashboard {
 
-static const char *TAG = "espaper_dashboard.message_widget";
+static const char *TAG = "espaper_dashboard_widgets.message_widget";
 
 void MessageWidget::draw(int start_x, int start_y) {
     display::Display *it = this->get_display_();
