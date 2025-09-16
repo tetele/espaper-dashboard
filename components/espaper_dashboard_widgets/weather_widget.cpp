@@ -9,58 +9,17 @@ namespace espaper_dashboard_widgets {
 
 static const char *TAG = "espaper_dashboard_widgets.weather_widget";
 
-static const char *FORECAST_ROOT_NODE = "forecast";
-static const char *FORECAST_LABEL_NODE = "label";
-static const char *FORECAST_TEMPERATURE_NODE = "temperature";
-static const char *FORECAST_CONDITION_NODE = "condition";
-
-struct WeatherStatus {
-    std::string title;
-    float temperature;
-    WeatherCondition condition;
-
-    WeatherStatus(std::string p_title, float p_temperature, WeatherCondition p_condition)
-        : title(std::move(p_title)), temperature(p_temperature), condition(p_condition)
-    {}
-
-    WeatherStatus(WeatherStatus&& other)
-        : title(std::move(other.title)), temperature(other.temperature), condition(other.condition)
-    {}
-
-    WeatherStatus& operator=(const WeatherStatus& other) = default;
-};
-
 void WeatherWidget::draw(int start_x, int start_y) {
     display::Display *it = this->get_display_();
 
     // current condition icon
-    it->printf(start_x+this->width_.value()/3, start_y+this->height_.value()/4, this->target_->get_large_glyph_font(), this->target_->get_light_color(), display::TextAlign::CENTER_RIGHT, "%s", condition_to_icon_(this->current_condition_sensor_->state).c_str());
+    it->printf(start_x+this->width_.value()/3, start_y+this->height_.value()/4, this->target_->get_large_glyph_font(), this->target_->get_light_color(), display::TextAlign::CENTER_RIGHT, "%s", condition_to_icon_(this->current_condition_.value()).c_str());
     // current temperature UOM
-    it->printf(start_x+this->width_.value()/2, start_y+this->height_.value()/4, this->target_->get_large_font(), this->target_->get_dark_color(), display::TextAlign::CENTER_LEFT, "%.1f%s", this->current_temperature_sensor_->state, this->temperature_uom_.c_str());
+    it->printf(start_x+this->width_.value()/2, start_y+this->height_.value()/4, this->target_->get_large_font(), this->target_->get_dark_color(), display::TextAlign::CENTER_LEFT, "%.1f%s", this->current_temperature_.value(), this->temperature_uom_.c_str());
     // current temperature
-    it->printf(start_x+this->width_.value()/2, start_y+this->height_.value()/4, this->target_->get_large_font(), this->target_->get_foreground_color(), display::TextAlign::CENTER_LEFT, "%.1f", this->current_temperature_sensor_->state);
+    it->printf(start_x+this->width_.value()/2, start_y+this->height_.value()/4, this->target_->get_large_font(), this->target_->get_foreground_color(), display::TextAlign::CENTER_LEFT, "%.1f", this->current_temperature_.value());
 
-    std::vector<WeatherStatus> forecast;
-
-    json::parse_json(this->forecast_sensor_->state, [&forecast, this](JsonObject root) -> bool {
-        auto new_forecast = root[FORECAST_ROOT_NODE];
-        if(!new_forecast) {
-            ESP_LOGW(TAG, "Invalid forecast object structure. See documentation.");
-            return false;
-        }
-        for(int i=0; i<new_forecast.size() && i<5; i++) {
-            if(!new_forecast[i] || !new_forecast[i][FORECAST_TEMPERATURE_NODE] || !new_forecast[i][FORECAST_CONDITION_NODE] || !new_forecast[i][FORECAST_LABEL_NODE]) {
-                ESP_LOGW(TAG, "Invalid forecast object structure. See documentation.");
-                return false;
-            }
-            forecast.push_back(WeatherStatus(
-                new_forecast[i][FORECAST_LABEL_NODE].as<std::string>(),
-                new_forecast[i][FORECAST_TEMPERATURE_NODE].as<float>(),
-                str_to_condition_(new_forecast[i][FORECAST_CONDITION_NODE].as<const char*>())
-            ));
-        }
-        return true;
-    });
+    std::vector<WeatherStatus> forecast = this->forecast_.value();
 
     int i=1, n=(forecast.size()+2)*2;
     for(const WeatherStatus& interval : forecast) {
