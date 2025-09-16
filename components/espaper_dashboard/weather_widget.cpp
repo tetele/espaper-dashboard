@@ -34,7 +34,7 @@ void WeatherWidget::draw(int start_x, int start_y) {
     display::Display *it = this->get_display_();
 
     // current condition icon
-    it->printf(start_x+this->width_.value()/3, start_y+this->height_.value()/4, this->target_->get_large_glyph_font(), this->target_->get_light_color(), display::TextAlign::CENTER_RIGHT, "%s", this->condition_to_icon_(this->current_condition_sensor_->state).c_str());
+    it->printf(start_x+this->width_.value()/3, start_y+this->height_.value()/4, this->target_->get_large_glyph_font(), this->target_->get_light_color(), display::TextAlign::CENTER_RIGHT, "%s", condition_to_icon_(this->current_condition_sensor_->state).c_str());
     // current temperature UOM
     it->printf(start_x+this->width_.value()/2, start_y+this->height_.value()/4, this->target_->get_large_font(), this->target_->get_dark_color(), display::TextAlign::CENTER_LEFT, "%.1f%s", this->current_temperature_sensor_->state, this->temperature_uom_.c_str());
     // current temperature
@@ -56,7 +56,7 @@ void WeatherWidget::draw(int start_x, int start_y) {
             forecast.push_back(WeatherStatus(
                 new_forecast[i][FORECAST_LABEL_NODE].as<std::string>(),
                 new_forecast[i][FORECAST_TEMPERATURE_NODE].as<float>(),
-                this->str_to_condition_(new_forecast[i][FORECAST_CONDITION_NODE].as<const char*>())
+                str_to_condition_(new_forecast[i][FORECAST_CONDITION_NODE].as<const char*>())
             ));
         }
         return true;
@@ -67,7 +67,7 @@ void WeatherWidget::draw(int start_x, int start_y) {
         // forcast timespan
         it->printf((i*2+1)*this->width_.value()/n, start_y+this->height_.value()/2, this->target_->get_default_font(), this->target_->get_dark_color(), display::TextAlign::TOP_CENTER, "%s", interval.title.c_str());
         // forecast condition icon
-        it->printf((i*2+1)*this->width_.value()/n, start_y+2*this->height_.value()/3, this->target_->get_glyph_font(), this->target_->get_light_color(), display::TextAlign::TOP_CENTER, "%s", this->condition_to_icon_(interval.condition).c_str());
+        it->printf((i*2+1)*this->width_.value()/n, start_y+2*this->height_.value()/3, this->target_->get_glyph_font(), this->target_->get_light_color(), display::TextAlign::TOP_CENTER, "%s", condition_to_icon_(interval.condition).c_str());
         // forecast temperature UOM
         int x, y, w, h;
         char t[20];
@@ -89,7 +89,7 @@ void WeatherWidget::dump_config() {
     ESP_LOGCONFIG(TAG, "  Weather widget");
 }
 
-WeatherCondition WeatherWidget::str_to_condition_(std::string condition) {
+WeatherCondition str_to_condition_(std::string condition) {
     if(condition == "cloudy") return CONDITION_CLOUDY;
     else if(condition == "fog") return CONDITION_FOG;
     else if(condition == "hail") return CONDITION_HAIL;
@@ -108,7 +108,7 @@ WeatherCondition WeatherWidget::str_to_condition_(std::string condition) {
     return CONDITION_PARTLYCLOUDY;
 }
 
-std::string WeatherWidget::condition_to_icon_(WeatherCondition condition) {
+std::string condition_to_icon_(WeatherCondition condition) {
     // TODO allow custom glyphs
     std::map<WeatherCondition, std::string> weather_icon_map {
         {CONDITION_CLOUDY, "\ue2bd"},
@@ -133,8 +133,8 @@ std::string WeatherWidget::condition_to_icon_(WeatherCondition condition) {
     return "";
 }
 
-std::string WeatherWidget::condition_to_icon_(std::string condition) {
-    return this->condition_to_icon_(this->str_to_condition_(condition));
+std::string condition_to_icon_(std::string condition) {
+    return condition_to_icon_(str_to_condition_(condition));
 
 
 }

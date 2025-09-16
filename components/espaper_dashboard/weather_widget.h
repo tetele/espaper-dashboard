@@ -39,11 +39,11 @@ protected:
     text_sensor::TextSensor *current_condition_sensor_{nullptr};
     text_sensor::TextSensor *forecast_sensor_{nullptr};
     std::string temperature_uom_{""};
-
-    WeatherCondition str_to_condition_(std::string condition);
-    std::string condition_to_icon_(WeatherCondition condition);
-    std::string condition_to_icon_(std::string condition);
 };
+
+WeatherCondition str_to_condition_(std::string condition);
+std::string condition_to_icon_(WeatherCondition condition);
+std::string condition_to_icon_(std::string condition);
 
 } // namespace espaper_dashboard
 } // namespace esphome
