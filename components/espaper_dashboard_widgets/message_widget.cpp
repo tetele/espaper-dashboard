@@ -4,7 +4,7 @@
 #include <map>
 
 namespace esphome {
-namespace espaper_dashboard {
+namespace espaper_dashboard_widgets {
 
 static const char *TAG = "espaper_dashboard_widgets.message_widget";
 

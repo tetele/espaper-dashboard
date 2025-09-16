@@ -3,7 +3,7 @@
 #include "esphome/components/espaper_dashboard/espaper_dashboard_widget.h"
 
 namespace esphome {
-namespace espaper_dashboard {
+namespace espaper_dashboard_widgets {
 
 typedef enum {
     CONDITION_CLEAR_NIGHT,
@@ -23,7 +23,7 @@ typedef enum {
     CONDITION_WINDY_VARIANT,
 } WeatherCondition;
 
-class WeatherWidget : public ESPaperDashboardWidget {
+class WeatherWidget : public espaper_dashboard::ESPaperDashboardWidget {
 public:
     void draw(int start_x, int start_y) override;
     void init_size() override;
@@ -45,5 +45,5 @@ WeatherCondition str_to_condition_(std::string condition);
 std::string condition_to_icon_(WeatherCondition condition);
 std::string condition_to_icon_(std::string condition);
 
-} // namespace espaper_dashboard
+} // namespace espaper_dashboard_widgets
 } // namespace esphome

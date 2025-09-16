@@ -3,9 +3,9 @@
 #include "esphome/components/espaper_dashboard/espaper_dashboard_widget.h"
 
 namespace esphome {
-namespace espaper_dashboard {
+namespace espaper_dashboard_widgets {
 
-class MessageWidget : public ESPaperDashboardWidget {
+class MessageWidget : public espaper_dashboard::ESPaperDashboardWidget {
 public:
     void draw(int start_x, int start_y) override;
     void init_size() override;
@@ -19,5 +19,5 @@ protected:
     TemplatableValue<std::string> message_{};
 };
 
-} // namespace espaper_dashboard
+} // namespace espaper_dashboard_widgets
 } // namespace esphome

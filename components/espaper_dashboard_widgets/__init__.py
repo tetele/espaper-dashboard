@@ -5,7 +5,6 @@ from esphome.components import sensor, text_sensor
 from esphome.components.espaper_dashboard import (
     WIDGET_SCHEMA_BASE,
     ESPaperDashboardWidget,
-    espaper_dashboard_ns,
     supported_widgets,
 )
 import esphome.config_validation as cv
@@ -15,8 +14,14 @@ DEPENDENCIES = ["espaper_dashboard"]
 
 CONFIG_SCHEMA = cv.Schema({})
 
-WeatherWidget = espaper_dashboard_ns.class_("WeatherWidget", ESPaperDashboardWidget)
-MessageWidget = espaper_dashboard_ns.class_("MessageWidget", ESPaperDashboardWidget)
+espaper_dashboard_widgets_ns = cg.esphome_ns.namespace("espaper_dashboard_widgets")
+
+WeatherWidget = espaper_dashboard_widgets_ns.class_(
+    "WeatherWidget", ESPaperDashboardWidget
+)
+MessageWidget = espaper_dashboard_widgets_ns.class_(
+    "MessageWidget", ESPaperDashboardWidget
+)
 
 
 CONF_TEMPERATURE_UOM = "temperature_uom"
