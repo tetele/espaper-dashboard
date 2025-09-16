@@ -16,11 +16,10 @@ CONFIG_SCHEMA = cv.Schema({})
 
 espaper_dashboard_widgets_ns = cg.esphome_ns.namespace("espaper_dashboard_widgets")
 
+######## WEATHER WIDGET
+
 WeatherWidget = espaper_dashboard_widgets_ns.class_(
     "WeatherWidget", ESPaperDashboardWidget
-)
-MessageWidget = espaper_dashboard_widgets_ns.class_(
-    "MessageWidget", ESPaperDashboardWidget
 )
 
 
@@ -89,6 +88,18 @@ async def weather_widget_to_code(widget: cg.MockObj, config: dict[str, Any]):
         cg.add(widget.set_forecast(forecast))
 
 
+supported_widgets.register(
+    "weather", WeatherWidget, WEATHER_WIDGET_SCHEMA, weather_widget_to_code
+)
+
+
+######## MESSAGE WIDGET
+
+MessageWidget = espaper_dashboard_widgets_ns.class_(
+    "MessageWidget", ESPaperDashboardWidget
+)
+
+
 MESSAGE_WIDGET_SCHEMA = WIDGET_SCHEMA_BASE.extend(
     {
         cv.Optional(CONF_ICON): cv.templatable(cv.string),
@@ -106,9 +117,6 @@ async def message_widget_to_code(widget: cg.MockObj, config: dict[str, Any]):
     cg.add(widget.set_message(message))
 
 
-supported_widgets.register(
-    "weather", WeatherWidget, WEATHER_WIDGET_SCHEMA, weather_widget_to_code
-)
 supported_widgets.register(
     "message", MessageWidget, MESSAGE_WIDGET_SCHEMA, message_widget_to_code
 )
