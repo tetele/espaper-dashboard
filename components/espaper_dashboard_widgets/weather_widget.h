@@ -23,27 +23,51 @@ typedef enum {
     CONDITION_WINDY_VARIANT,
 } WeatherCondition;
 
+WeatherCondition str_to_condition_(std::string condition);
+std::string condition_to_icon_(WeatherCondition condition);
+std::string condition_to_icon_(std::string condition);
+
+struct WeatherStatus {
+    std::string title;
+    float temperature;
+    WeatherCondition condition;
+
+    WeatherStatus(std::string p_title, float p_temperature, WeatherCondition p_condition)
+        : title(std::move(p_title)), temperature(p_temperature), condition(p_condition)
+    {}
+
+    WeatherStatus(std::string p_title, float p_temperature, std::string p_condition)
+        : title(std::move(p_title)), temperature(p_temperature), condition(str_to_condition_(p_condition))
+    {}
+
+    WeatherStatus(const WeatherStatus& other)
+        : title(std::move(other.title)), temperature(other.temperature), condition(other.condition)
+    {}
+
+    WeatherStatus(WeatherStatus&& other)
+        : title(std::move(other.title)), temperature(other.temperature), condition(other.condition)
+    {}
+
+    WeatherStatus& operator=(const WeatherStatus& other) = default;
+};
+
 class WeatherWidget : public espaper_dashboard::ESPaperDashboardWidget {
 public:
     void draw(int start_x, int start_y) override;
     void init_size() override;
     void dump_config() override;
 
-    void set_current_temperature_sensor(sensor::Sensor *sensor) { this->current_temperature_sensor_ = sensor; };
-    void set_current_condition_sensor(text_sensor::TextSensor *sensor) { this->current_condition_sensor_ = sensor; };
-    void set_forecast_sensor(text_sensor::TextSensor *sensor) { this->forecast_sensor_ = sensor; };
     void set_temperature_uom(std::string uom) { this->temperature_uom_ = uom; };
+    template<typename T> void set_current_temperature(T current_temperature) { this->current_temperature_ = current_temperature; };
+    template<typename T> void set_current_condition(T current_condition) { this->current_condition_ = current_condition; };
+    template<typename T> void set_forecast(T forecast) { this->forecast_ = forecast; };
 
 protected:
-    sensor::Sensor *current_temperature_sensor_{nullptr};
-    text_sensor::TextSensor *current_condition_sensor_{nullptr};
-    text_sensor::TextSensor *forecast_sensor_{nullptr};
     std::string temperature_uom_{""};
+    TemplatableValue<float> current_temperature_{};
+    TemplatableValue<std::string> current_condition_{};
+    TemplatableValue<std::vector<WeatherStatus>> forecast_{};
 };
-
-WeatherCondition str_to_condition_(std::string condition);
-std::string condition_to_icon_(WeatherCondition condition);
-std::string condition_to_icon_(std::string condition);
 
 } // namespace espaper_dashboard_widgets
 } // namespace esphome

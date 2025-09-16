@@ -66,41 +66,41 @@ espaper_dashboard: # component name
 Specific configuration:
 
 - **temperature_uom** (*Optional*, `string`): The unit of measurement for the temperature. Defaults to `°C`.
-- **current_temperature_sensor_id** (**Required**, [Sensor](https://esphome.io/components/sensor/)): The ID of a `Sensor` containing the current temperature.
-- **current_condition_sensor_id** (**Required**, [TextSensor](https://esphome.io/components/text_sensor)): The ID of a `TextSensor` containing the current weather condition, which must be one of [these values](https://developers.home-assistant.io/docs/core/entity/weather#recommended-values-for-state-and-condition).
-- **forecast_sensor_id** (**Required**, [TextSensor](https://esphome.io/components/text_sensor)): The ID of a `TextSensor` containing a JSON with the forecast. The mandatory format of the JSON is:
-  - **forecast**: a list of objects containing forcasts. The max size of the list is hard-coded to 5. Each forecast item contains
-    - **label**: a string which designates the timeframe that the forecast describes (e.g. `23:00` or `Tuesday`)
+- **current_temperature** (**Required**, [templatable](https://esphome.io/automations/templates#config-templatable)): The current temperature to display
+- **current_condition** (**Required**, [templatable](https://esphome.io/automations/templates#config-templatable)): The current weather condition, which must be one of [these values](https://developers.home-assistant.io/docs/core/entity/weather#recommended-values-for-state-and-condition).
+- **forecast** (**Required**, [templatable](https://esphome.io/automations/templates#config-templatable)): A list of objects with the forecast. The mandatory format of each object is:
+  - **forecast**: a list of objects containing forcasts as `WeatherStatus` objects. Each forecast item contains
+    - **title**: a string which designates the timeframe that the forecast describes (e.g. `23:00` or `Tuesday`)
     - **condition**: a string [from this list](https://developers.home-assistant.io/docs/core/entity/weather#recommended-values-for-state-and-condition) containing the weather condition
     - **temperature**: a numeric value representing the temperature for the forecast
 
-Here's an example `forecast` text sensor content:
+Here's an example `forecast` list:
 
-```json
-{
-  "forecast": [
-    {
-      "condition": "sunny",
-      "label": "12:00",
-      "temperature": 26.7
-    },
-    {
-      "condition": "sunny",
-      "label": "14:00",
-      "temperature": 28.5
-    },
-    {
-      "condition": "sunny",
-      "label": "16:00",
-      "temperature": 29.2
-    },
-    {
-      "condition": "partlycloudy",
-      "label": "18:00",
-      "temperature": 28.3
-    }
-  ]
-}
+```yaml
+espaper_dashboard:
+  widgets:
+    - type: weather
+      forecast:
+        - condition: "sunny"
+          label: "12:00"
+          temperature: 26.7
+        - condition: "sunny"
+          label: "14:00"
+          temperature: 28.5
+        - condition: "sunny"
+          label: "16:00"
+          temperature: 29.2
+        - condition: "partlycloudy"
+          label: "18:00"
+          temperature: 28.3
+    - type: weather
+      forecast: !lambda |-
+        return std::vector<espaper_dashboard_widgets::WeatherStatus> {
+          espaper_dashboard_widgets::WeatherStatus("12:00", 26.7, "sunny"),
+          espaper_dashboard_widgets::WeatherStatus("14:00", 28.5, "sunny"),
+          espaper_dashboard_widgets::WeatherStatus("16:00", 29.2, "sunny"),
+          espaper_dashboard_widgets::WeatherStatus("18:00", 28.3, "partlycloudy")
+        };
 ```
 
 You can create such a sensor from HA using a template such as
@@ -130,22 +130,22 @@ template:
           forecast: >-
             {% set forecast_attr = [
               {
-                "label": as_timestamp(forecast['weather.home'].forecast[1].datetime) | timestamp_custom("%H:00"),
+                "title": as_timestamp(forecast['weather.home'].forecast[1].datetime) | timestamp_custom("%H:00"),
                 "condition": forecast['weather.home'].forecast[1].condition,
                 "temperature": forecast['weather.home'].forecast[1].temperature,
               },
               {
-                "label": as_timestamp(forecast['weather.home'].forecast[3].datetime) | timestamp_custom("%H:00"),
+                "title": as_timestamp(forecast['weather.home'].forecast[3].datetime) | timestamp_custom("%H:00"),
                 "condition": forecast['weather.home'].forecast[3].condition,
                 "temperature": forecast['weather.home'].forecast[3].temperature,
               },
               {
-                "label": as_timestamp(forecast['weather.home'].forecast[5].datetime) | timestamp_custom("%H:00"),
+                "title": as_timestamp(forecast['weather.home'].forecast[5].datetime) | timestamp_custom("%H:00"),
                 "condition": forecast['weather.home'].forecast[5].condition,
                 "temperature": forecast['weather.home'].forecast[5].temperature,
               },
               {
-                "label": as_timestamp(forecast['weather.home'].forecast[7].datetime) | timestamp_custom("%H:00"),
+                "title": as_timestamp(forecast['weather.home'].forecast[7].datetime) | timestamp_custom("%H:00"),
                 "condition": forecast['weather.home'].forecast[7].condition,
                 "temperature": forecast['weather.home'].forecast[7].temperature,
               },

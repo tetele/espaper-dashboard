@@ -88,9 +88,19 @@ espaper_dashboard:
       message: !lambda 'return "Downpour expected";'
     - id: weather_today
       type: weather
-      current_condition_sensor_id: weather_current_condition
-      current_temperature_sensor_id: weather_current_temperature
-      forecast_sensor_id: weather_hourly_forecast
+      current_condition: !lambda "return id(weather_current_condition).state;"
+      current_temperature: 21 # !lambda "return id(weather_current_temperature).state;"
+      # forecast:
+      #   - title: 1
+      #     temperature: 23.3
+      #     condition: lightning
+      forecast: !lambda |-
+        std::vector<espaper_dashboard_widgets::WeatherStatus> v{
+          espaper_dashboard_widgets::WeatherStatus("now", 23.3, "lightning"),
+          espaper_dashboard_widgets::WeatherStatus("soon", 21.7, "lightning-rainy"),
+          espaper_dashboard_widgets::WeatherStatus("later", 20.1, "partlycloudy")
+        };
+        return v;
       priority: 2
 
 sensor:
