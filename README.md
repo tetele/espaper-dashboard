@@ -11,7 +11,7 @@ The component is included as follows.
 ```yaml
 external_components:
   - source: github://tetele/espaper-dashboard@main
-    components: [ espaper_dashboard ]
+    components: [ espaper_dashboard, espaper_dashboard_widgets ]
 ```
 
 ## Configuration variables
