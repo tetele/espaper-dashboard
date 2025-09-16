@@ -1,3 +1,6 @@
+from collections.abc import Callable
+from typing import Any
+
 import esphome.codegen as cg
 from esphome.components import display, sensor, text_sensor
 import esphome.config_validation as cv
@@ -29,6 +32,84 @@ CONF_WIDGETS = "widgets"
 espaper_dashboard_ns = cg.esphome_ns.namespace("espaper_dashboard")
 ESPaperDashboard = espaper_dashboard_ns.class_("ESPaperDashboard", cg.Component)
 ESPaperDashboardWidget = espaper_dashboard_ns.class_("ESPaperDashboardWidget")
+
+
+class WidgetData:
+    def __init__(
+        self,
+        type: cg.MockObjClass,
+        schema: cv.Schema,
+        to_code_func: Callable[[cg.MockObj, dict[str, Any]], None],
+    ):
+        self.type: cg.MockObjClass = type
+        self.schema: cv.Schema = schema
+        self.to_code: Callable[[cg.MockObj, dict[str, Any]], None] = to_code_func
+
+
+class Widgets:
+    def __init__(self):
+        self.widget_types: dict[str, WidgetData] = {}
+
+    def register(
+        self,
+        name: str,
+        type: cg.MockObjClass,
+        schema: cv.Schema,
+        to_code_func: Callable[[cg.MockObj, dict], None],
+    ):
+        """Register a new widget type."""
+        assert name not in self.widget_types, f"Widget {name} already registered"
+        assert type.inherits_from(ESPaperDashboardWidget), (
+            f"Widget {name} type ({type}) must inherit from {ESPaperDashboardWidget}"
+        )
+
+        self.widget_types[name] = WidgetData(type, schema, to_code_func)
+
+    def get(self, name: str) -> WidgetData:
+        if name in self.widget_types:
+            return self.widget_types[name]
+        return None
+
+    def schema(self) -> cv.Schema:
+        """Return the schema for all registered widgets."""
+        return cv.typed_schema(
+            ({name: data.schema for (name, data) in self.widget_types.items()}),
+            lower=True,
+        )
+
+    def validate(self, value):
+        # Custom validation is used so that we make sure that all widgets are registered at the time of schema validation
+        return self.schema()(value)
+
+    async def to_code(self, dashboard: cg.MockObj, config: dict[str, Any]) -> None:
+        assert config[CONF_TYPE] in self.widget_types
+        structure: WidgetData = self.widget_types[config[CONF_TYPE]]
+
+        widget = cg.Pvariable(config[CONF_ID], structure.type.new(), structure.type)
+
+        cg.add(dashboard.add_widget(widget))
+        cg.add(widget.set_target(dashboard))
+
+        if CONF_SHOULD_DRAW in config:
+            should_draw = await cg.templatable(config[CONF_SHOULD_DRAW], [], cg.bool_)
+
+            cg.add(widget.set_should_draw(should_draw))
+
+        if CONF_PRIORITY in config:
+            priority = await cg.templatable(config[CONF_PRIORITY], [], cg.int_)
+
+            cg.add(widget.set_priority(priority))
+
+        if CONF_WIDTH in config and CONF_HEIGHT in config:
+            width = await cg.templatable(config[CONF_WIDTH], [], cg.int_)
+            height = await cg.templatable(config[CONF_HEIGHT], [], cg.int_)
+            cg.add(widget.set_width(width))
+            cg.add(widget.set_height(height))
+
+        await structure.to_code(widget, config)
+
+
+supported_widgets = Widgets()
 
 WeatherWidget = espaper_dashboard_ns.class_("WeatherWidget", ESPaperDashboardWidget)
 MessageWidget = espaper_dashboard_ns.class_("MessageWidget", ESPaperDashboardWidget)
