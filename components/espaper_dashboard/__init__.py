@@ -1,20 +1,21 @@
+from collections.abc import Callable
+from typing import Any
+
 import esphome.codegen as cg
-from esphome.components import display, sensor, text_sensor
+from esphome.components import display
 import esphome.config_validation as cv
 from esphome.const import (
     CONF_BACKGROUND_COLOR,
     CONF_DISPLAY_ID,
     CONF_FOREGROUND_COLOR,
     CONF_HEIGHT,
-    CONF_ICON,
     CONF_ID,
-    CONF_MESSAGE,
     CONF_PRIORITY,
     CONF_TYPE,
     CONF_WIDTH,
 )
 
-AUTO_LOAD = ["json"]
+AUTO_LOAD = ["json", "espaper_dashboard_widgets"]
 
 CONF_LABEL_COLOR = "label_color"
 CONF_LIGHT_COLOR = "light_color"
@@ -30,8 +31,83 @@ espaper_dashboard_ns = cg.esphome_ns.namespace("espaper_dashboard")
 ESPaperDashboard = espaper_dashboard_ns.class_("ESPaperDashboard", cg.Component)
 ESPaperDashboardWidget = espaper_dashboard_ns.class_("ESPaperDashboardWidget")
 
-WeatherWidget = espaper_dashboard_ns.class_("WeatherWidget", ESPaperDashboardWidget)
-MessageWidget = espaper_dashboard_ns.class_("MessageWidget", ESPaperDashboardWidget)
+
+class WidgetData:
+    def __init__(
+        self,
+        type: cg.MockObjClass,
+        schema: cv.Schema,
+        to_code_func: Callable[[cg.MockObj, dict[str, Any]], None],
+    ):
+        self.type: cg.MockObjClass = type
+        self.schema: cv.Schema = schema
+        self.to_code: Callable[[cg.MockObj, dict[str, Any]], None] = to_code_func
+
+
+class Widgets:
+    def __init__(self):
+        self.widget_types: dict[str, WidgetData] = {}
+
+    def register(
+        self,
+        name: str,
+        type: cg.MockObjClass,
+        schema: cv.Schema,
+        to_code_func: Callable[[cg.MockObj, dict], None],
+    ):
+        """Register a new widget type."""
+        assert name not in self.widget_types, f"Widget {name} already registered"
+        assert type.inherits_from(ESPaperDashboardWidget), (
+            f"Widget {name} type ({type}) must inherit from {ESPaperDashboardWidget}"
+        )
+
+        self.widget_types[name] = WidgetData(type, schema, to_code_func)
+
+    def get(self, name: str) -> WidgetData:
+        if name in self.widget_types:
+            return self.widget_types[name]
+        return None
+
+    def schema(self) -> cv.Schema:
+        """Return the schema for all registered widgets."""
+        return cv.typed_schema(
+            ({name: data.schema for (name, data) in self.widget_types.items()}),
+            lower=True,
+        )
+
+    def validate(self, value):
+        # Custom validation is used so that we make sure that all widgets are registered at the time of schema validation
+        return self.schema()(value)
+
+    async def to_code(self, dashboard: cg.MockObj, config: dict[str, Any]) -> None:
+        assert config[CONF_TYPE] in self.widget_types
+        structure: WidgetData = self.widget_types[config[CONF_TYPE]]
+
+        widget = cg.Pvariable(config[CONF_ID], structure.type.new(), structure.type)
+
+        cg.add(dashboard.add_widget(widget))
+        cg.add(widget.set_target(dashboard))
+
+        if CONF_SHOULD_DRAW in config:
+            should_draw = await cg.templatable(config[CONF_SHOULD_DRAW], [], cg.bool_)
+
+            cg.add(widget.set_should_draw(should_draw))
+
+        if CONF_PRIORITY in config:
+            priority = await cg.templatable(config[CONF_PRIORITY], [], cg.int_)
+
+            cg.add(widget.set_priority(priority))
+
+        if CONF_WIDTH in config and CONF_HEIGHT in config:
+            width = await cg.templatable(config[CONF_WIDTH], [], cg.int_)
+            height = await cg.templatable(config[CONF_HEIGHT], [], cg.int_)
+            cg.add(widget.set_width(width))
+            cg.add(widget.set_height(height))
+
+        await structure.to_code(widget, config)
+
+
+supported_widgets = Widgets()
 
 Color = cg.esphome_ns.class_("Color")
 Font = cg.esphome_ns.namespace("font").class_("Font")
@@ -44,40 +120,6 @@ WIDGET_SCHEMA_BASE = cv.Schema(
         cv.Optional(CONF_WIDTH): cv.templatable(cv.Range(min=1)),
         cv.Optional(CONF_HEIGHT): cv.templatable(cv.Range(min=1)),
     },
-)
-
-
-CONF_TEMPERATURE_UOM = "temperature_uom"
-CONF_CURRENT_TEMPERATURE_SENSOR_ID = "current_temperature_sensor_id"
-CONF_CURRENT_CONDITION_SENSOR_ID = "current_condition_sensor_id"
-CONF_FORECAST_SENSOR_ID = "forecast_sensor_id"
-
-WEATHER_WIDGET_SCHEMA = WIDGET_SCHEMA_BASE.extend(
-    {
-        cv.Optional(CONF_TEMPERATURE_UOM, default="°C"): cv.string,
-        cv.Required(CONF_CURRENT_TEMPERATURE_SENSOR_ID): cv.use_id(sensor.Sensor),
-        cv.Required(CONF_CURRENT_CONDITION_SENSOR_ID): cv.use_id(
-            text_sensor.TextSensor
-        ),
-        cv.Required(CONF_FORECAST_SENSOR_ID): cv.use_id(text_sensor.TextSensor),
-    }
-)
-
-MESSAGE_WIDGET_SCHEMA = WIDGET_SCHEMA_BASE.extend(
-    {
-        cv.Optional(CONF_ICON): cv.templatable(cv.string),
-        cv.Required(CONF_MESSAGE): cv.templatable(cv.string),
-    }
-)
-
-WIDGET_TYPES = {
-    "weather": (WeatherWidget, WEATHER_WIDGET_SCHEMA),
-    "message": (MessageWidget, MESSAGE_WIDGET_SCHEMA, [CONF_ICON, CONF_MESSAGE]),
-}
-
-WIDGET_SCHEMA = cv.typed_schema(
-    ({type: data[1] for (type, data) in WIDGET_TYPES.items()}),
-    lower=True,
 )
 
 CONFIG_SCHEMA = cv.Schema(
@@ -93,7 +135,7 @@ CONFIG_SCHEMA = cv.Schema(
         cv.Optional(CONF_LARGE_FONT): cv.use_id(Font),
         cv.Required(CONF_GLYPH_FONT): cv.use_id(Font),
         cv.Optional(CONF_LARGE_GLYPH_FONT): cv.use_id(Font),
-        cv.Required(CONF_WIDGETS): cv.ensure_list(WIDGET_SCHEMA),
+        cv.Required(CONF_WIDGETS): cv.ensure_list(supported_widgets.validate),
     }
 )
 
@@ -141,47 +183,4 @@ async def to_code(config):
         cg.add(var.set_large_glyph_font(glyph_font))
 
     for widget_conf in config[CONF_WIDGETS]:
-        widget_type = WIDGET_TYPES[widget_conf[CONF_TYPE]]
-        widget = cg.Pvariable(
-            widget_conf[CONF_ID], widget_type[0].new(), widget_type[0]
-        )
-
-        cg.add(var.add_widget(widget))
-        cg.add(widget.set_target(var))
-
-        if CONF_SHOULD_DRAW in widget_conf:
-            should_draw = await cg.templatable(
-                widget_conf[CONF_SHOULD_DRAW], [], cg.bool_
-            )
-
-            cg.add(widget.set_should_draw(should_draw))
-
-        if CONF_PRIORITY in widget_conf:
-            priority = await cg.templatable(widget_conf[CONF_PRIORITY], [], cg.int_)
-
-            cg.add(widget.set_priority(priority))
-
-        if CONF_WIDTH in widget_conf and CONF_HEIGHT in widget_conf:
-            width = await cg.templatable(widget_conf[CONF_WIDTH], [], cg.int_)
-            height = await cg.templatable(widget_conf[CONF_HEIGHT], [], cg.int_)
-            cg.add(widget.set_width(width))
-            cg.add(widget.set_height(height))
-
-        for k, v in widget_conf.items():
-            if k not in (
-                CONF_ID,
-                CONF_SHOULD_DRAW,
-                CONF_PRIORITY,
-                CONF_TYPE,
-                CONF_WIDTH,
-                CONF_HEIGHT,
-            ):
-                if k.endswith("_id"):
-                    v = await cg.get_variable(v)
-                    k = k[:-3]
-                if (len(widget_type) > 2) and (
-                    k in widget_type[2]
-                ):  # if it's templateable
-                    v = await cg.templatable(v, [], cg.std_string)
-                method = getattr(widget, "set_" + k)
-                cg.add(method(v))
+        await supported_widgets.to_code(var, widget_conf)
