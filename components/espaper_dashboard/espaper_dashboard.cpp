@@ -29,6 +29,9 @@ void ESPaperDashboard::loop()
 void ESPaperDashboard::dump_config()
 {
     ESP_LOGCONFIG(TAG, "ESPaper Dashboard");
+    for(auto widget : this->widgets_) {
+        widget->dump_config();
+    }
 }
 
 void ESPaperDashboard::draw() {

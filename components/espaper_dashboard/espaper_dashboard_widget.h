@@ -11,6 +11,7 @@ class ESPaperDashboardWidget {
 public:
     virtual void draw(int start_x, int start_y) = 0;
     virtual void init_size() = 0;
+    virtual void dump_config() = 0;
 
     void set_target(ESPaperDashboard *target) { this->target_ = target; };
     template<typename T> void set_width(T width) { this->width_ = width; };
@@ -69,19 +70,6 @@ protected:
     WeatherCondition str_to_condition_(std::string condition);
     std::string condition_to_icon_(WeatherCondition condition);
     std::string condition_to_icon_(std::string condition);
-};
-
-class MessageWidget : public ESPaperDashboardWidget {
-public:
-    void draw(int start_x, int start_y) override;
-    void init_size() override;
-
-    template<typename T> void set_icon(T icon) { this->icon_ = icon; };
-    template<typename T> void set_message(T message) { this->message_ = message; };
-
-protected:
-    TemplatableValue<std::string> icon_{};
-    TemplatableValue<std::string> message_{};
 };
 
 } // namespace espaper_dashboard
