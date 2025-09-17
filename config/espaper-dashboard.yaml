@@ -82,6 +82,15 @@ espaper_dashboard:
   glyph_font: glyph_font
   large_glyph_font: glyph_font_large
   widgets:
+    - id: gradient_squares
+      type: custom
+      lambda: |-
+        ESP_LOGI("lambda", "Starting display lambda");
+        ESP_LOGI("lambda", "Native width %d", it.get_native_width());
+        it.filled_rectangle(start_x+40, start_y+40, 40, 40, id(color_white));
+        it.filled_rectangle(start_x+120, start_y+40, 40, 40, id(color_light_gray));
+        it.filled_rectangle(start_x+200, start_y+40, 40, 40, id(color_dark_gray));
+        it.filled_rectangle(start_x+280, start_y+40, 40, 40, id(color_black));
     - id: urgent_message
       type: message
       # icon: "\uf61d"

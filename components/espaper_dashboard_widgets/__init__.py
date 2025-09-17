@@ -1,14 +1,20 @@
 from typing import Any
 
 import esphome.codegen as cg
-from esphome.components import sensor, text_sensor
+from esphome.components import display
 from esphome.components.espaper_dashboard import (
     WIDGET_SCHEMA_BASE,
     ESPaperDashboardWidget,
     supported_widgets,
 )
 import esphome.config_validation as cv
-from esphome.const import CONF_CONDITION, CONF_ICON, CONF_MESSAGE, CONF_TEMPERATURE
+from esphome.const import (
+    CONF_CONDITION,
+    CONF_ICON,
+    CONF_LAMBDA,
+    CONF_MESSAGE,
+    CONF_TEMPERATURE,
+)
 
 DEPENDENCIES = ["espaper_dashboard"]
 
@@ -119,4 +125,32 @@ async def message_widget_to_code(widget: cg.MockObj, config: dict[str, Any]):
 
 supported_widgets.register(
     "message", MessageWidget, MESSAGE_WIDGET_SCHEMA, message_widget_to_code
+)
+
+
+######## CUSTOM WIDGET
+
+CustomWidget = espaper_dashboard_widgets_ns.class_(
+    "CustomWidget", ESPaperDashboardWidget
+)
+
+
+CUSTOM_WIDGET_SCHEMA = WIDGET_SCHEMA_BASE.extend(
+    {
+        cv.Required(CONF_LAMBDA): cv.lambda_,
+    }
+)
+
+
+async def custom_widget_to_code(widget: cg.MockObj, config: dict[str, Any]):
+    lambda_ = await cg.process_lambda(
+        config[CONF_LAMBDA],
+        [(display.DisplayRef, "it"), (cg.int_, "start_x"), (cg.int_, "start_y")],
+        return_type=cg.void,
+    )
+    cg.add(widget.set_lambda(lambda_))
+
+
+supported_widgets.register(
+    "custom", CustomWidget, CUSTOM_WIDGET_SCHEMA, custom_widget_to_code
 )
