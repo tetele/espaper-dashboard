@@ -162,6 +162,17 @@ Specific configuration:
 - **icon** (*Optional*, [templatable](https://esphome.io/automations/templates#config-templatable)): The character used for the icon
 - **message** (**Required**, [templatable](https://esphome.io/automations/templates#config-templatable)): The message to display
 
+### Custom Widget
+
+Displays a custom widget however you want it.
+
+Specific configuration:
+
+- **lambda** (*Required*, [lambda](https://www.esphome.io/automations/templates/#all-lambda-calls)): A function you define that will be called when the widget needs to be drawn. The function receives 3 input arguments:
+  - **it**: A [`Display`](https://www.esphome.io/components/display) component that you can use to do the actual drawing like `it.draw_pixel_at(2,3);`
+  - **start_x**: The X coordinate where the widget should be drawn
+  - **start_y**: The Y coordinate where the widget should be drawn
+
 
 ## Usage
 
