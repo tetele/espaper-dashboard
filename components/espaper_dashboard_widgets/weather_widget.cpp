@@ -32,7 +32,7 @@ void WeatherWidget::draw(int start_x, int start_y) {
         char t[20];
         sprintf(t, "%.1f%s", interval.temperature, this->temperature_uom_.c_str());
         it->get_text_bounds(start_x+(i*2+1)*this->width_.value()/n, start_y+5*this->height_.value()/6, t, this->target_->get_default_font(), display::TextAlign::TOP_CENTER, &x, &y, &w, &h);
-        it->printf(x, y, this->target_->get_default_font(), this->target_->get_dark_color(), display::TextAlign::TOP_LEFT, "%.1f°C", interval.temperature);
+        it->printf(x, y, this->target_->get_default_font(), this->target_->get_dark_color(), display::TextAlign::TOP_LEFT, "%.1f%s", interval.temperature, this->temperature_uom_.c_str());
         // forecast temperature
         it->printf(x, y, this->target_->get_default_font(), this->target_->get_foreground_color(), display::TextAlign::TOP_LEFT, "%.1f", interval.temperature);
         i++;
