@@ -44,6 +44,7 @@ void ESPaperDashboard::draw() {
     };
     std::sort(sorted_widgets.begin(), sorted_widgets.end(), compare_priorities);
     for(auto widget : sorted_widgets) {
+        App.feed_wdt();
         if(total_height + widget->get_height() > this->display_->get_height()) break;
         if(!widget->should_draw()) continue;
 
