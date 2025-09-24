@@ -199,11 +199,10 @@ async def to_code(config):
         await supported_widgets.to_code(var, widget_conf)
 
 
-ESPAPER_DASHBOARD_NEEDS_REDRAW_CONDITION_SCHEMA = cv.maybe_simple_value(
+ESPAPER_DASHBOARD_NEEDS_REDRAW_CONDITION_SCHEMA = automation.maybe_simple_id(
     {
-        cv.GenerateID(CONF_ID): cv.use_id(ESPaperDashboard),
-    },
-    key=CONF_ID,
+        cv.GenerateID(): cv.use_id(ESPaperDashboard),
+    }
 )
 
 

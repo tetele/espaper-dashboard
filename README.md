@@ -213,14 +213,86 @@ espaper_dashboard:
       ...
 ```
 
+## Conditions
+
+### `espaper_dashboard.needs_redraw`
+
+Specifies if the dashboard needs a to be redrawn, i.e. if any of the following conditions are true:
+- a previously displayed widget's `should_draw` lambda returns `false`
+- a previously hidden widget's `should_draw` lambda returns `true`
+- a visible widget's `priority` has changed
+- a visible widget was marked as stale using `espaper_dashboard_widget.mark_stale`
+
+If only one `espaper_dashboard` component exists, the component ID is optional. If multiple components exist, the ID must be provided as such
+
+```yaml
+- if:
+    any:
+      - espaper_dashboard.needs_redraw: the_id
+      - espaper_dashboard.needs_redraw:
+          id: the_id
+```
+
+Example implementation:
+
+```yaml
+display:
+  - id: my_display
+    ...
+
+espaper_dashboard:
+  ...
+
+something:
+  on_event:
+    if:
+      condition:
+        espaper_dashboard.needs_redraw:
+      then:
+        component.update: my_display
+```
+
 ## Usage
 
 1. Define a dashboard with some widgets
 1. Add `should_draw` and `priority` lambdas to those widgets to filter and sort which of them should get drawn
 1. Call `component.update` on the `espaper_dashboard` component to redraw it, if needed
 
-The dashboard will NOT refresh automatically, you need to call `component.update` to refresh it. Even then, it will only actually refresh if any of the following conditions are true:
-- a previously displayed widget's `should_draw` lambda returns `false`
-- a previously hidden widget's `should_draw` lambda returns `true`
-- a visible widget's `priority` has changed
-- a visible widget was marked as stale using `espaper_dashboard_widget.mark_stale`
+The dashboard will NOT refresh automatically, you need to call `component.update` to refresh it.
+
+```yaml
+display:
+  - id: my_display
+    # e-paper display
+    ...
+
+espaper_dashboard:
+  ...
+  widgets:
+    - id: example_widget
+      type: message
+      message: !lambda 'return id(important_message).state;'
+      should_draw: !lambda 'return (id(the_time).now().hour > 7) && (id(the_time).now().hour < 22);' # don't show during the night
+    ...
+
+text_sensor:
+  - id: important_message
+    platform: homeassistant
+    entity_id: sensor.important_message
+    on_value:
+      then:
+        # this widget depends on the sensor data, so mark it as stale when the sensor value changes
+        - espaper_dashboard_widget.mark_stale: example_widget
+
+time:
+  - platform: ...
+    id: the_time
+    on_time:
+      - minutes: /1
+        then:
+          - if:
+              condition:
+                espaper_dashboard.needs_refresh: # ID can be ommitted if there is only one component instance
+              then:
+                - component.update: my_display
+```
