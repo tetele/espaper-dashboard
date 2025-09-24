@@ -53,7 +53,6 @@ struct WeatherStatus {
 
 class WeatherWidget : public espaper_dashboard::ESPaperDashboardWidget {
 public:
-    void draw(int start_x, int start_y) override;
     void init_size() override;
     void dump_config() override;
 
@@ -63,6 +62,8 @@ public:
     template<typename T> void set_forecast(T forecast) { this->forecast_ = forecast; };
 
 protected:
+    void internal_draw(int start_x, int start_y) override;
+
     std::string temperature_uom_{""};
     TemplatableValue<float> current_temperature_{};
     TemplatableValue<std::string> current_condition_{};
