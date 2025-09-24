@@ -2,7 +2,11 @@
 
 An [ESPHome](http://esphome.io) component meant to be used with e-paper displays in order to create informative dashboards.
 
-It is recommended to test using the [SDL2 component](https://esphome.io/components/display/sdl/#sdl) for the [`host` platform](https://esphome.io/components/host/) in ESPHome, so that compile times are greatly reduced.
+You can define a number of widgets and specify via [lambda functions](https://esphome.io/automations/templates) if they should be displayed, in which order. It is optimized for e-paper displays in that it only refreshes if widget data is old or "stale" of the a previously shown widget should not be shown or viceversa.
+
+There are a few built-in widgets (including a `custom` widget that you can program yourself), but the plan is to make widgets extensible and implemented by the community.
+
+During development, it is recommended to test using the [SDL2 component](https://esphome.io/components/display/sdl/#sdl) for the [`host` platform](https://esphome.io/components/host/) in ESPHome, so that compile times are greatly reduced. Once the design of the dashboard is complete, you can obviously move to an e-paper display.
 
 To test with real Home Assistant data, the `host` platform can be connected to a HA instance on port `6053`, which is forwarded in the devcontainer. However, keep in mind that firewalls may play a part and that you are responsible to facilitate HA to connect to the port on your development machine.
 
@@ -168,12 +172,55 @@ Displays a custom widget however you want it.
 
 Specific configuration:
 
-- **lambda** (*Required*, [lambda](https://www.esphome.io/automations/templates/#all-lambda-calls)): A function you define that will be called when the widget needs to be drawn. The function receives 3 input arguments:
+- **lambda** (**Required**, [lambda](https://www.esphome.io/automations/templates/#all-lambda-calls)): A function you define that will be called when the widget needs to be drawn. The function receives 3 input arguments:
   - **it**: A [`Display`](https://www.esphome.io/components/display) component that you can use to do the actual drawing like `it.draw_pixel_at(2,3);`
   - **start_x**: The X coordinate where the widget should be drawn
   - **start_y**: The Y coordinate where the widget should be drawn
 
+## Actions
+
+### `espaper_dashboard_widget.mark_stale`
+
+If data is being imported from another system, we need a way to signal to the dashboard that the currently displayed data is no longer valid. For this purpose, you can mark a widget as "stale" when the data it uses is refreshed.
+
+Parameters:
+- **widget_id** (**Required**, ID): The ID of the widget you want to mark as stale
+
+There is a shorthand version of this action. The following are equivalent:
+
+```yaml
+actions:
+  - espaper_dashboard_widget.mark_stale:
+      widget_id: my_widget
+  - espaper_dashboard_widget.mark_stale: my_widget
+```
+
+Example implementation:
+
+```yaml
+sensor:
+  - id: external_sensor
+    platform: homeassistant
+    entity_id: sensor.my_sensor
+    on_value:
+      then:
+        - espaper_dashboard_widget.mark_stale: widget_using_sensor
+
+espaper_dashboard:
+  ...
+  widgets:
+    - id: widget_using_sensor
+      ...
+```
 
 ## Usage
 
-TODO
+1. Define a dashboard with some widgets
+1. Add `should_draw` and `priority` lambdas to those widgets to filter and sort which of them should get drawn
+1. Call `component.update` on the `espaper_dashboard` component to redraw it, if needed
+
+The dashboard will NOT refresh automatically, you need to call `component.update` to refresh it. Even then, it will only actually refresh if any of the following conditions are true:
+- a previously displayed widget's `should_draw` lambda returns `false`
+- a previously hidden widget's `should_draw` lambda returns `true`
+- a visible widget's `priority` has changed
+- a visible widget was marked as stale using `espaper_dashboard_widget.mark_stale`
