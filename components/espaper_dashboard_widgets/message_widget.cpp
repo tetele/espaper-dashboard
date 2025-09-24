@@ -14,7 +14,7 @@ void MessageWidget::init_size() {
 }
 
 void MessageWidget::dump_config() {
-    ESP_LOGCONFIG(TAG, "  Message widget");
+    ESP_LOGCONFIG(TAG, "  Message widget %s", this->id_.c_str());
 }
 
 void MessageWidget::internal_draw(int start_x, int start_y) {

@@ -7,6 +7,8 @@ namespace espaper_dashboard_widgets {
 
 class MessageWidget : public espaper_dashboard::ESPaperDashboardWidget {
 public:
+    MessageWidget(std::string id) : ESPaperDashboardWidget(id) {};
+
     void init_size() override;
     void dump_config() override;
 

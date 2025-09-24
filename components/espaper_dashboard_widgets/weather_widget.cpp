@@ -15,7 +15,7 @@ void WeatherWidget::init_size() {
 }
 
 void WeatherWidget::dump_config() {
-    ESP_LOGCONFIG(TAG, "  Weather widget");
+    ESP_LOGCONFIG(TAG, "  Weather widget %s", this->id_.c_str());
 }
 
 WeatherCondition str_to_condition_(std::string condition) {

@@ -12,7 +12,7 @@ void CustomWidget::init_size() {
 }
 
 void CustomWidget::dump_config() {
-    ESP_LOGCONFIG(TAG, "  Custom widget");
+    ESP_LOGCONFIG(TAG, "  Custom widget %s", this->id_.c_str());
 }
 
 void CustomWidget::internal_draw(int start_x, int start_y) {

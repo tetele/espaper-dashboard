@@ -10,6 +10,8 @@ namespace espaper_dashboard {
 
 class ESPaperDashboardWidget {
 public:
+    ESPaperDashboardWidget(std::string id) : id_(id) {};
+
     void draw(int start_x, int start_y);
     virtual void init_size() = 0;
     virtual void dump_config() = 0;
@@ -30,6 +32,7 @@ public:
     bool needs_redraw();
 
 protected:
+    std::string id_{};
     virtual void internal_draw(int start_x, int start_y) = 0;
 
     ESPaperDashboard *target_{nullptr};

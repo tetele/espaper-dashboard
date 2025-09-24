@@ -88,7 +88,11 @@ class Widgets:
         assert config[CONF_TYPE] in self.widget_types
         structure: WidgetData = self.widget_types[config[CONF_TYPE]]
 
-        widget = cg.Pvariable(config[CONF_ID], structure.type.new(), structure.type)
+        widget = cg.Pvariable(
+            config[CONF_ID],
+            structure.type.new(str(config[CONF_ID])),
+            structure.type,
+        )
 
         cg.add(dashboard.add_widget(widget))
         cg.add(widget.set_target(dashboard))

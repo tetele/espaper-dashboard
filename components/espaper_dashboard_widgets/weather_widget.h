@@ -53,6 +53,8 @@ struct WeatherStatus {
 
 class WeatherWidget : public espaper_dashboard::ESPaperDashboardWidget {
 public:
+    WeatherWidget(std::string id) : ESPaperDashboardWidget(id) {};
+
     void init_size() override;
     void dump_config() override;
 

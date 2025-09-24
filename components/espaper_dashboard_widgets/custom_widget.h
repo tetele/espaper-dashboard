@@ -9,6 +9,8 @@ typedef std::function<void(display::Display &, int, int)> custom_widget_writer_t
 
 class CustomWidget : public espaper_dashboard::ESPaperDashboardWidget {
 public:
+    CustomWidget(std::string id) : ESPaperDashboardWidget(id) {};
+
     void init_size() override;
     void dump_config() override;
 
