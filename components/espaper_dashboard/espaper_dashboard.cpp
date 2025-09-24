@@ -47,7 +47,7 @@ void ESPaperDashboard::draw() {
         if(total_height + widget->get_height() > this->display_->get_height()) break;
         if(!widget->should_draw()) continue;
 
-        if(widget->is_stale()) {
+        if(widget->needs_redraw()) {
             should_redraw = true;
             break;
         }
@@ -58,13 +58,17 @@ void ESPaperDashboard::draw() {
         ESP_LOGD(TAG, "No widget needs to be redrawn, skipping.");
         return;
     }
+    ESP_LOGD(TAG, "Redrawing ESPaper dashboard.");
 
     total_height = 0;
     this->display_->fill(this->get_background_color());
     for(auto widget : sorted_widgets) {
         App.feed_wdt();
         if(total_height + widget->get_height() > this->display_->get_height()) break;
-        if(!widget->should_draw()) continue;
+        if(!widget->should_draw()) {
+            widget->mark_not_drawn();
+            continue;
+        }
 
         this->display_->start_clipping(0, total_height, widget->get_width(), total_height+widget->get_height());
         widget->draw(0, total_height);

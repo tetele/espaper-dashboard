@@ -26,6 +26,8 @@ public:
 
     bool is_stale() { return this->is_stale_; };
     void mark_stale() { this->is_stale_ = true; };
+    void mark_not_drawn() { this->was_drawn_ = false; };
+    bool needs_redraw();
 
 protected:
     virtual void internal_draw(int start_x, int start_y) = 0;
@@ -38,6 +40,7 @@ protected:
 
     display::Display *get_display_() { return this->target_->get_display(); };
     bool is_stale_{true};
+    bool was_drawn_{false};
 };
 
 } // namespace espaper_dashboard
