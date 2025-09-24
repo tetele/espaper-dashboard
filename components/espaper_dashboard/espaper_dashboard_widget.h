@@ -10,7 +10,7 @@ namespace espaper_dashboard {
 
 class ESPaperDashboardWidget {
 public:
-    virtual void draw(int start_x, int start_y) = 0;
+    void draw(int start_x, int start_y);
     virtual void init_size() = 0;
     virtual void dump_config() = 0;
 
@@ -28,6 +28,8 @@ public:
     void mark_stale() { this->is_stale_ = true; };
 
 protected:
+    virtual void internal_draw(int start_x, int start_y) = 0;
+
     ESPaperDashboard *target_{nullptr};
     TemplatableValue<int> width_{0};
     TemplatableValue<int> height_{0};
