@@ -1,6 +1,7 @@
 from collections.abc import Callable
 from typing import Any
 
+from esphome import automation
 import esphome.codegen as cg
 from esphome.components import display
 import esphome.config_validation as cv
@@ -30,6 +31,10 @@ CONF_WIDGETS = "widgets"
 espaper_dashboard_ns = cg.esphome_ns.namespace("espaper_dashboard")
 ESPaperDashboard = espaper_dashboard_ns.class_("ESPaperDashboard", cg.Component)
 ESPaperDashboardWidget = espaper_dashboard_ns.class_("ESPaperDashboardWidget")
+
+ESPaperDashboardWidgetMarkStaleAction = espaper_dashboard_ns.class_(
+    "ESPaperDashboardWidgetMarkStaleAction", automation.Action
+)
 
 
 class WidgetData:
@@ -184,3 +189,25 @@ async def to_code(config):
 
     for widget_conf in config[CONF_WIDGETS]:
         await supported_widgets.to_code(var, widget_conf)
+
+
+CONF_WIDGET_ID = "widget_id"
+ESPAPER_DASHBOARD_MARK_STALE_ACTION_SCHEMA = cv.maybe_simple_value(
+    {
+        cv.GenerateID(CONF_WIDGET_ID): cv.use_id(ESPaperDashboardWidget),
+    },
+    key=CONF_WIDGET_ID,
+)
+
+
+@automation.register_action(
+    "espaper_dashboard_widget.mark_stale",
+    ESPaperDashboardWidgetMarkStaleAction,
+    ESPAPER_DASHBOARD_MARK_STALE_ACTION_SCHEMA,
+)
+async def espaper_dashboard_widget_mark_stale_to_code(
+    config, action_id, template_arg, args
+):
+    parent = await cg.get_variable(config[CONF_WIDGET_ID])
+    var = cg.new_Pvariable(action_id, template_arg, parent)
+    return var
