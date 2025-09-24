@@ -41,6 +41,8 @@ public:
 
     void add_widget(ESPaperDashboardWidget *widget);
 
+    bool needs_redraw();
+
 protected:
     display::Display *display_{nullptr};
     Color bg_color_{display::COLOR_ON};
@@ -54,6 +56,8 @@ protected:
     font::Font *large_glyph_font_{nullptr};
 
     std::vector<ESPaperDashboardWidget *> widgets_;
+
+    std::vector<ESPaperDashboardWidget *> sorted_widgets_();
 };
 
 } // namespace espaper_dashboard
