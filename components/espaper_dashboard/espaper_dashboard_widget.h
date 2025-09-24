@@ -24,6 +24,9 @@ public:
     template<typename T> void set_priority(T priority) { this->priority_ = priority; };
     int get_priority() { return this->priority_.value(); };
 
+    bool is_stale() { return this->is_stale_; };
+    void mark_stale() { this->is_stale_ = true; };
+
 protected:
     ESPaperDashboard *target_{nullptr};
     TemplatableValue<int> width_{0};
@@ -32,6 +35,7 @@ protected:
     TemplatableValue<int> priority_{};
 
     display::Display *get_display_() { return this->target_->get_display(); };
+    bool is_stale_{false};
 };
 
 } // namespace espaper_dashboard
