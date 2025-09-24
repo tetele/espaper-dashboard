@@ -37,7 +37,7 @@ protected:
     TemplatableValue<int> priority_{};
 
     display::Display *get_display_() { return this->target_->get_display(); };
-    bool is_stale_{false};
+    bool is_stale_{true};
 };
 
 } // namespace espaper_dashboard

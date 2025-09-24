@@ -35,14 +35,32 @@ void ESPaperDashboard::dump_config()
 }
 
 void ESPaperDashboard::draw() {
-    this->display_->fill(this->get_background_color());
-
     int total_height = 0;
     std::vector<ESPaperDashboardWidget*> sorted_widgets = this->widgets_;
     auto compare_priorities = [](ESPaperDashboardWidget *a, ESPaperDashboardWidget *b) {
         return (a->get_priority() > b->get_priority());
     };
     std::sort(sorted_widgets.begin(), sorted_widgets.end(), compare_priorities);
+    bool should_redraw = false;
+    for(auto widget : sorted_widgets) {
+        App.feed_wdt(); // Computing lambdas might take some time
+        if(total_height + widget->get_height() > this->display_->get_height()) break;
+        if(!widget->should_draw()) continue;
+
+        if(widget->is_stale()) {
+            should_redraw = true;
+            break;
+        }
+        total_height += widget->get_height();
+    }
+
+    if(!should_redraw) {
+        ESP_LOGD(TAG, "No widget needs to be redrawn, skipping.");
+        return;
+    }
+
+    total_height = 0;
+    this->display_->fill(this->get_background_color());
     for(auto widget : sorted_widgets) {
         App.feed_wdt();
         if(total_height + widget->get_height() > this->display_->get_height()) break;
