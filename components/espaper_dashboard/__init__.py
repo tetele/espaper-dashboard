@@ -36,6 +36,10 @@ ESPaperDashboardWidgetMarkStaleAction = espaper_dashboard_ns.class_(
     "ESPaperDashboardWidgetMarkStaleAction", automation.Action
 )
 
+ESPaperDashboardNeedsRedrawCondition = espaper_dashboard_ns.class_(
+    "ESPaperDashboardNeedsRedrawCondition", automation.Condition
+)
+
 
 class WidgetData:
     def __init__(
@@ -193,6 +197,26 @@ async def to_code(config):
 
     for widget_conf in config[CONF_WIDGETS]:
         await supported_widgets.to_code(var, widget_conf)
+
+
+ESPAPER_DASHBOARD_NEEDS_REDRAW_CONDITION_SCHEMA = cv.maybe_simple_value(
+    {
+        cv.GenerateID(CONF_ID): cv.use_id(ESPaperDashboard),
+    },
+    key=CONF_ID,
+)
+
+
+@automation.register_condition(
+    "espaper_dashboard.needs_redraw",
+    ESPaperDashboardNeedsRedrawCondition,
+    ESPAPER_DASHBOARD_NEEDS_REDRAW_CONDITION_SCHEMA,
+)
+async def espaper_dashboard_needs_redraw_to_code(
+    config, condition_id, template_arg, args
+):
+    parent = await cg.get_variable(config[CONF_ID])
+    return cg.new_Pvariable(condition_id, template_arg, parent)
 
 
 CONF_WIDGET_ID = "widget_id"

@@ -132,4 +132,13 @@ binary_sensor:
     platform: sdl
     key: SDLK_SPACE
     on_release:
-      - component.update: the_display
+      - if:
+          condition:
+            espaper_dashboard.needs_redraw: the_dashboard
+          then:
+            - logger.log:
+                format: "Dashboard requires redraw"
+            - component.update: the_display
+          else:
+            - logger.log:
+                format: "No redraw required"
