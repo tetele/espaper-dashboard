@@ -22,7 +22,7 @@ public:
     template<typename T> void set_should_draw(T should_draw) { this->should_draw_ = should_draw; };
     bool should_draw();
     template<typename T> void set_priority(T priority) { this->priority_ = priority; };
-    int get_priority() { return this->priority_.value(); };
+    int get_priority();
 
     bool is_stale() { return this->is_stale_; };
     void mark_stale() { this->is_stale_ = true; };
@@ -41,6 +41,9 @@ protected:
     display::Display *get_display_() { return this->target_->get_display(); };
     bool is_stale_{true};
     bool was_drawn_{false};
+
+private:
+    int old_priority_{0};
 };
 
 } // namespace espaper_dashboard

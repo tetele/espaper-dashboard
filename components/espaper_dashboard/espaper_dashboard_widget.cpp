@@ -23,6 +23,19 @@ bool ESPaperDashboardWidget::should_draw() {
     return true;
 }
 
+int ESPaperDashboardWidget::get_priority()  {
+    if(this->priority_.has_value()) {
+        int priority = this->priority_.value();
+        ESP_LOGD(TAG, "Old prio: %d, new prio: %d", this->old_priority_, priority); // DELETE ME
+        if(this->old_priority_ != priority) {
+            this->mark_stale();
+            this->old_priority_ = priority;
+        }
+        return priority;
+    }
+    return 0;
+}
+
 bool ESPaperDashboardWidget::needs_redraw() {
     return this->is_stale() || (this->was_drawn_ != this->should_draw());
 }
