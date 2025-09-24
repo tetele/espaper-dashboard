@@ -196,7 +196,7 @@ async def to_code(config):
 
 
 CONF_WIDGET_ID = "widget_id"
-ESPAPER_DASHBOARD_MARK_STALE_ACTION_SCHEMA = cv.maybe_simple_value(
+ESPAPER_DASHBOARD_WIDGET_MARK_STALE_ACTION_SCHEMA = cv.maybe_simple_value(
     {
         cv.GenerateID(CONF_WIDGET_ID): cv.use_id(ESPaperDashboardWidget),
     },
@@ -207,7 +207,7 @@ ESPAPER_DASHBOARD_MARK_STALE_ACTION_SCHEMA = cv.maybe_simple_value(
 @automation.register_action(
     "espaper_dashboard_widget.mark_stale",
     ESPaperDashboardWidgetMarkStaleAction,
-    ESPAPER_DASHBOARD_MARK_STALE_ACTION_SCHEMA,
+    ESPAPER_DASHBOARD_WIDGET_MARK_STALE_ACTION_SCHEMA,
 )
 async def espaper_dashboard_widget_mark_stale_to_code(
     config, action_id, template_arg, args
