@@ -11,10 +11,33 @@ namespace espaper_dashboard {
 
 static const char *TAG = "espaper_dashboard.widget";
 
+void ESPaperDashboardWidget::draw(int start_x, int start_y) {
+    this->was_drawn_ = true;
+    this->is_stale_ = false;
+    this->internal_draw(start_x, start_y);
+}
+
 bool ESPaperDashboardWidget::should_draw() {
     if (this->should_draw_.has_value())
         return this->should_draw_.value();
     return true;
+}
+
+int ESPaperDashboardWidget::get_priority()  {
+    if(this->priority_.has_value()) {
+        int priority = this->priority_.value();
+        ESP_LOGD(TAG, "Old prio: %d, new prio: %d", this->old_priority_, priority); // DELETE ME
+        if(this->old_priority_ != priority) {
+            this->mark_stale();
+            this->old_priority_ = priority;
+        }
+        return priority;
+    }
+    return 0;
+}
+
+bool ESPaperDashboardWidget::needs_redraw() {
+    return this->is_stale() || (this->was_drawn_ != this->should_draw());
 }
 
 }

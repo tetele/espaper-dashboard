@@ -10,7 +10,7 @@ namespace espaper_dashboard {
 
 class ESPaperDashboardWidget {
 public:
-    virtual void draw(int start_x, int start_y) = 0;
+    void draw(int start_x, int start_y);
     virtual void init_size() = 0;
     virtual void dump_config() = 0;
 
@@ -22,9 +22,16 @@ public:
     template<typename T> void set_should_draw(T should_draw) { this->should_draw_ = should_draw; };
     bool should_draw();
     template<typename T> void set_priority(T priority) { this->priority_ = priority; };
-    int get_priority() { return this->priority_.value(); };
+    int get_priority();
+
+    bool is_stale() { return this->is_stale_; };
+    void mark_stale() { this->is_stale_ = true; };
+    void mark_not_drawn() { this->was_drawn_ = false; };
+    bool needs_redraw();
 
 protected:
+    virtual void internal_draw(int start_x, int start_y) = 0;
+
     ESPaperDashboard *target_{nullptr};
     TemplatableValue<int> width_{0};
     TemplatableValue<int> height_{0};
@@ -32,6 +39,11 @@ protected:
     TemplatableValue<int> priority_{};
 
     display::Display *get_display_() { return this->target_->get_display(); };
+    bool is_stale_{true};
+    bool was_drawn_{false};
+
+private:
+    int old_priority_{0};
 };
 
 } // namespace espaper_dashboard

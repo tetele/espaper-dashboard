@@ -9,36 +9,6 @@ namespace espaper_dashboard_widgets {
 
 static const char *TAG = "espaper_dashboard_widgets.weather_widget";
 
-void WeatherWidget::draw(int start_x, int start_y) {
-    display::Display *it = this->get_display_();
-
-    // current condition icon
-    it->printf(start_x+this->width_.value()/3, start_y+this->height_.value()/4, this->target_->get_large_glyph_font(), this->target_->get_light_color(), display::TextAlign::CENTER_RIGHT, "%s", condition_to_icon_(this->current_condition_.value()).c_str());
-    // current temperature UOM
-    it->printf(start_x+this->width_.value()/2, start_y+this->height_.value()/4, this->target_->get_large_font(), this->target_->get_dark_color(), display::TextAlign::CENTER_LEFT, "%.1f%s", this->current_temperature_.value(), this->temperature_uom_.c_str());
-    // current temperature
-    it->printf(start_x+this->width_.value()/2, start_y+this->height_.value()/4, this->target_->get_large_font(), this->target_->get_foreground_color(), display::TextAlign::CENTER_LEFT, "%.1f", this->current_temperature_.value());
-
-    std::vector<WeatherStatus> forecast = this->forecast_.value();
-
-    int i=1, n=(forecast.size()+2)*2;
-    for(const WeatherStatus& interval : forecast) {
-        // forcast timespan
-        it->printf((i*2+1)*this->width_.value()/n, start_y+this->height_.value()/2, this->target_->get_default_font(), this->target_->get_dark_color(), display::TextAlign::TOP_CENTER, "%s", interval.title.c_str());
-        // forecast condition icon
-        it->printf((i*2+1)*this->width_.value()/n, start_y+2*this->height_.value()/3, this->target_->get_glyph_font(), this->target_->get_light_color(), display::TextAlign::TOP_CENTER, "%s", condition_to_icon_(interval.condition).c_str());
-        // forecast temperature UOM
-        int x, y, w, h;
-        char t[20];
-        sprintf(t, "%.1f%s", interval.temperature, this->temperature_uom_.c_str());
-        it->get_text_bounds(start_x+(i*2+1)*this->width_.value()/n, start_y+5*this->height_.value()/6, t, this->target_->get_default_font(), display::TextAlign::TOP_CENTER, &x, &y, &w, &h);
-        it->printf(x, y, this->target_->get_default_font(), this->target_->get_dark_color(), display::TextAlign::TOP_LEFT, "%.1f%s", interval.temperature, this->temperature_uom_.c_str());
-        // forecast temperature
-        it->printf(x, y, this->target_->get_default_font(), this->target_->get_foreground_color(), display::TextAlign::TOP_LEFT, "%.1f", interval.temperature);
-        i++;
-    }
-}
-
 void WeatherWidget::init_size() {
     if(!this->width_.has_value() || !this->width_.value()) this->width_ = this->get_display_()->get_width();
     if(!this->height_.has_value() || !this->height_.value()) this->height_ = this->width_.value()*7/16;
@@ -96,6 +66,36 @@ std::string condition_to_icon_(std::string condition) {
     return condition_to_icon_(str_to_condition_(condition));
 
 
+}
+
+void WeatherWidget::internal_draw(int start_x, int start_y) {
+    display::Display *it = this->get_display_();
+
+    // current condition icon
+    it->printf(start_x+this->width_.value()/3, start_y+this->height_.value()/4, this->target_->get_large_glyph_font(), this->target_->get_light_color(), display::TextAlign::CENTER_RIGHT, "%s", condition_to_icon_(this->current_condition_.value()).c_str());
+    // current temperature UOM
+    it->printf(start_x+this->width_.value()/2, start_y+this->height_.value()/4, this->target_->get_large_font(), this->target_->get_dark_color(), display::TextAlign::CENTER_LEFT, "%.1f%s", this->current_temperature_.value(), this->temperature_uom_.c_str());
+    // current temperature
+    it->printf(start_x+this->width_.value()/2, start_y+this->height_.value()/4, this->target_->get_large_font(), this->target_->get_foreground_color(), display::TextAlign::CENTER_LEFT, "%.1f", this->current_temperature_.value());
+
+    std::vector<WeatherStatus> forecast = this->forecast_.value();
+
+    int i=1, n=(forecast.size()+2)*2;
+    for(const WeatherStatus& interval : forecast) {
+        // forcast timespan
+        it->printf((i*2+1)*this->width_.value()/n, start_y+this->height_.value()/2, this->target_->get_default_font(), this->target_->get_dark_color(), display::TextAlign::TOP_CENTER, "%s", interval.title.c_str());
+        // forecast condition icon
+        it->printf((i*2+1)*this->width_.value()/n, start_y+2*this->height_.value()/3, this->target_->get_glyph_font(), this->target_->get_light_color(), display::TextAlign::TOP_CENTER, "%s", condition_to_icon_(interval.condition).c_str());
+        // forecast temperature UOM
+        int x, y, w, h;
+        char t[20];
+        sprintf(t, "%.1f%s", interval.temperature, this->temperature_uom_.c_str());
+        it->get_text_bounds(start_x+(i*2+1)*this->width_.value()/n, start_y+5*this->height_.value()/6, t, this->target_->get_default_font(), display::TextAlign::TOP_CENTER, &x, &y, &w, &h);
+        it->printf(x, y, this->target_->get_default_font(), this->target_->get_dark_color(), display::TextAlign::TOP_LEFT, "%.1f%s", interval.temperature, this->temperature_uom_.c_str());
+        // forecast temperature
+        it->printf(x, y, this->target_->get_default_font(), this->target_->get_foreground_color(), display::TextAlign::TOP_LEFT, "%.1f", interval.temperature);
+        i++;
+    }
 }
 
 }
