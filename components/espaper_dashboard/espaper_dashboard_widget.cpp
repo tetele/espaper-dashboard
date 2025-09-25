@@ -21,6 +21,26 @@ void ESPaperDashboardWidget::draw(int start_x, int start_y) {
 void ESPaperDashboardWidget::init() {
     this->init_size();
 
+    if(this->target_->get_persist_data()) {
+#ifdef USE_HOST
+        uint32_t hash = fnv1_hash(this->id_); // you can't `esphome run` without compiling in host mode
+#else
+        uint32_t hash = fnv1_hash(App.get_compilation_time() + this->id_);
+#endif
+        this->old_priority_pref_ = global_preferences->make_preference<int>(hash);
+        int old_priority;
+        if(this->old_priority_pref_.load(&old_priority)) this->old_priority_ = old_priority;
+
+        this->is_stale_pref_ = global_preferences->make_preference<bool>(hash+1);
+        bool is_stale;
+        if(this->is_stale_pref_.load(&is_stale)) this->is_stale_ = is_stale;
+
+        this->was_drawn_pref_ = global_preferences->make_preference<bool>(hash+2);
+        bool was_drawn;
+        if(this->was_drawn_pref_.load(&was_drawn)) this->was_drawn_ = was_drawn;
+
+        ESP_LOGV(TAG, "[%s] Loaded old data: old_priority(%d), is_stale(%s), was_drawn(%s)", this->id_.c_str(), this->old_priority_, YESNO(this->is_stale_), YESNO(this->was_drawn_));
+    }
 }
 
 bool ESPaperDashboardWidget::should_draw() {

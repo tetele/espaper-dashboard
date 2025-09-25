@@ -48,6 +48,9 @@ protected:
 
 private:
     int old_priority_{0};
+    esphome::ESPPreferenceObject old_priority_pref_;
+    esphome::ESPPreferenceObject is_stale_pref_;
+    esphome::ESPPreferenceObject was_drawn_pref_;
 };
 
 } // namespace espaper_dashboard
