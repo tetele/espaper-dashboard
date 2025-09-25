@@ -16,7 +16,7 @@ void ESPaperDashboard::setup()
     });
 
     for(auto widget : this->widgets_) {
-        widget->init_size();
+        widget->init();
     }
 }
 

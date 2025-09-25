@@ -13,6 +13,7 @@ public:
     ESPaperDashboardWidget(std::string id) : id_(id) {};
 
     void draw(int start_x, int start_y);
+    void init();
     virtual void init_size() = 0;
     virtual void dump_config() = 0;
 

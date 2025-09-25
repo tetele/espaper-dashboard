@@ -18,6 +18,11 @@ void ESPaperDashboardWidget::draw(int start_x, int start_y) {
     this->internal_draw(start_x, start_y);
 }
 
+void ESPaperDashboardWidget::init() {
+    this->init_size();
+
+}
+
 bool ESPaperDashboardWidget::should_draw() {
     if (this->should_draw_.has_value())
         return this->should_draw_.value();
