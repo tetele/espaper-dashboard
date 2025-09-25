@@ -28,8 +28,8 @@ public:
     int get_priority();
 
     bool is_stale() { return this->is_stale_; };
-    void mark_stale() { this->is_stale_ = true; };
-    void mark_not_drawn() { this->was_drawn_ = false; };
+    void mark_stale() { this->set_is_stale_(true); };
+    void mark_not_drawn() { this->set_was_drawn_(false); };
     bool needs_redraw();
 
 protected:
@@ -44,10 +44,13 @@ protected:
 
     display::Display *get_display_() { return this->target_->get_display(); };
     bool is_stale_{true};
+    void set_is_stale_(bool is_stale);
     bool was_drawn_{false};
+    void set_was_drawn_(bool was_drawn);
 
 private:
     int old_priority_{0};
+    void set_old_priority_(int old_priority);
     esphome::ESPPreferenceObject old_priority_pref_;
     esphome::ESPPreferenceObject is_stale_pref_;
     esphome::ESPPreferenceObject was_drawn_pref_;

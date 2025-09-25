@@ -12,9 +12,9 @@ namespace espaper_dashboard {
 static const char *TAG = "espaper_dashboard.widget";
 
 void ESPaperDashboardWidget::draw(int start_x, int start_y) {
-    this->was_drawn_ = true;
-    this->is_stale_ = false;
-    this->old_priority_ = this->get_priority();
+    this->set_was_drawn_(true);
+    this->set_is_stale_(false);
+    this->set_old_priority_(this->get_priority());
     this->internal_draw(start_x, start_y);
 }
 
@@ -74,6 +74,31 @@ bool ESPaperDashboardWidget::needs_redraw() {
     }
 
     return false;
+}
+
+void ESPaperDashboardWidget::set_is_stale_(bool is_stale) {
+    this->is_stale_ = is_stale;
+    if(this->target_->get_persist_data()) {
+        this->is_stale_pref_.save(&this->is_stale_);
+        ESP_LOGV(TAG, "[%s] Persisting is_stale(%s)", this->id_.c_str(), YESNO(this->is_stale_));
+    }
+}
+
+void ESPaperDashboardWidget::set_was_drawn_(bool was_drawn) {
+    this->was_drawn_ = was_drawn;
+    if(this->target_->get_persist_data()) {
+        this->was_drawn_pref_.save(&this->was_drawn_);
+        ESP_LOGV(TAG, "[%s] Persisting was_drawn(%s)", this->id_.c_str(), YESNO(this->was_drawn_));
+    }
+}
+
+
+void ESPaperDashboardWidget::set_old_priority_(int old_priority) {
+    this->old_priority_ = old_priority;
+    if(this->target_->get_persist_data()) {
+        this->old_priority_pref_.save(&this->old_priority_);
+        ESP_LOGV(TAG, "[%s] Persisting was_drawn(%d)", this->id_.c_str(), this->old_priority_);
+    }
 }
 
 }
