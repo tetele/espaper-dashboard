@@ -27,6 +27,7 @@ CONF_GLYPH_FONT = "glyph_font"
 CONF_LARGE_GLYPH_FONT = "large_glyph_font"
 CONF_SHOULD_DRAW = "should_draw"
 CONF_WIDGETS = "widgets"
+CONF_PERSIST_DATA = "persist_data"
 
 espaper_dashboard_ns = cg.esphome_ns.namespace("espaper_dashboard")
 ESPaperDashboard = espaper_dashboard_ns.class_("ESPaperDashboard", cg.Component)
@@ -149,6 +150,7 @@ CONFIG_SCHEMA = cv.Schema(
         cv.Required(CONF_GLYPH_FONT): cv.use_id(Font),
         cv.Optional(CONF_LARGE_GLYPH_FONT): cv.use_id(Font),
         cv.Required(CONF_WIDGETS): cv.ensure_list(supported_widgets.validate),
+        cv.Optional(CONF_PERSIST_DATA, default=False): cv.boolean,
     }
 )
 
@@ -197,6 +199,9 @@ async def to_code(config):
 
     for widget_conf in config[CONF_WIDGETS]:
         await supported_widgets.to_code(var, widget_conf)
+
+    if CONF_PERSIST_DATA in config:
+        cg.add(var.set_persist_data(config[CONF_PERSIST_DATA]))
 
 
 ESPAPER_DASHBOARD_NEEDS_REDRAW_CONDITION_SCHEMA = automation.maybe_simple_id(

@@ -41,6 +41,9 @@ public:
 
     void add_widget(ESPaperDashboardWidget *widget);
 
+    void set_persist_data(bool persist_data) { this->persist_data_ = persist_data; };
+    bool get_persist_data() { return this->persist_data_; };
+
     bool needs_redraw();
 
 protected:
@@ -56,6 +59,8 @@ protected:
     font::Font *large_glyph_font_{nullptr};
 
     std::vector<ESPaperDashboardWidget *> widgets_;
+
+    bool persist_data_{false};
 
     std::vector<ESPaperDashboardWidget *> sorted_widgets_();
 };

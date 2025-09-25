@@ -29,6 +29,7 @@ void ESPaperDashboard::loop()
 void ESPaperDashboard::dump_config()
 {
     ESP_LOGCONFIG(TAG, "ESPaper Dashboard");
+    ESP_LOGCONFIG(TAG, "  Persistent data: %s", YESNO(this->persist_data_));
     for(auto widget : this->widgets_) {
         widget->dump_config();
     }
